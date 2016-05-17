@@ -326,22 +326,22 @@ fitNoise <- function(dof, pct=0.95, ndecimals=3, fitmetric='R2', ...){
 #' @export
 #' fitEquiv()
 fitEquiv <- function(fitval, dof, pct=0.95, ndecimals=3, fitmetric="R2", ...){
-	nlevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, ...)								#find R2p
+	noiselevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, ...)								#find R2p
 	
 	if(fitmetric=="R2"){
-		eqfitval <- (fitval-nlevel)/(1-nlevel + 0.00000000001)			#rescale R2 to where it lies between 1 and baseline noise; add smidge incase r2p=1
+		eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)			#rescale R2 to where it lies between 1 and baseline noise; add smidge incase r2p=1
 	} else if (fitmetric=="RMSE") {
-		eqfitval <- (nlevel-fitval)/nlevel		
+		eqfitval <- fitval/noiselevel		
 	} else {
 		stop(paste(fitmetric, "is not a valid fitmetric for the fitEquiv routine"))
 	}
 	
 	
 	#make eqfitval consistent with the number of decimal places in nlevel.
-	fl <- floor(nlevel)								
+	fl <- floor(noiselevel)								
 	nd=rep(0,length(fitval))
-	if(nlevel-fl>0){
-		nd <- nchar(sapply(strsplit(as.character(nlevel), ".",fixed=T), "[[", 2))} 
+	if(noiselevel-fl>0){
+		nd <- nchar(sapply(strsplit(as.character(noiselevel), ".",fixed=T), "[[", 2))} 
 	eqfitval <- round(eqfitval, ndecimals)
 	
 	return(eqfitval)
@@ -684,13 +684,12 @@ plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetr
 	doflength = length(doflist)
 	pctlength = length(pctlist)
 
-	ptable <- NoiseTable(doflist=doflist,pctlist=pctlist,order=order,fitmetric=fitmetric,...)
-	#ppp <- ptable
-	r2p <- ptable[(dof-1),1]
-	r2k <- fitEquiv(fitval,dof=dof,...)
-	if(fitmetric=="R2"){	f = (fitval-r2p)/(1-r2p);	ylb=expression(R^2);		ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]}
-	if(fitmetric=="RMSE"){	f = (r2p-fitval)/r2p;		ylb=expression(RMSE);	ptable$fitEquiv <- ptable[,1] - f*(ptable[,1])}
-	#ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]   	#this should be column 3 if pctr2 is being plotted and 2 if not
+	ptable <- NoiseTable(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, ...)  #ptable is the list of noiselevel (r2p) values for this fitmetric at each dof
+
+	r2p <- ptable[(dof-1),1]			#column 1 is the r2p values
+	r2k <- fitEquiv(fitval,dof=dof,...)		#find the r2k value for this dof (single number)
+	if(fitmetric=="R2"){	f = fitEquiv(fitval,dof,pct,fitmetric="R2");		ylb=expression(R^2);	ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]}
+	if(fitmetric=="RMSE"){	f = fitEquiv(fitval,dof,pct,fitmetric="RMSE");	ylb=expression(RMSE);	ptable$fitEquiv <- f*(ptable[,1])}
 
 	tx = max(doflist[doflength])
 
@@ -698,16 +697,18 @@ plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetr
 
 	
 	plt <- ggplot(ptable) +
-			geom_point(aes(as.numeric(row.names(ptable)),ptable[,1]),color=mcolor[1],size=2,na.rm=T) +
-			geom_point(aes(as.numeric(row.names(ptable)),ptable[,2]),color=mcolor[6],size=2,na.rm=T) +
-			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),shape=8, color=mcolor[3],size=5,na.rm=T) + 
+			geom_point(aes(as.numeric(row.names(ptable)),ptable[,1]),shape=1, color=mcolor[1],size=2,na.rm=T) +
+			geom_point(aes(as.numeric(row.names(ptable)),ptable[,2]),shape=16,color=mcolor[6],size=2,na.rm=T) +
+			geom_point(data=data.frame(fitval,dof), aes(dof,fitval), shape=8, color=mcolor[3],size=5,na.rm=T) + 
+			geom_point(data=data.frame(r2p, dof),   aes(dof,r2p),    shape=16,color=mcolor[1],size=3,na.rm=T) +
 			ggtitle(paste(fitmetric, "Noise Baseline and Equivalent Measure \nwith Constant Noise Level")) +
 			xlab("Degrees of Freedom") +
 			ylab(ylb) + 
-			geom_text(x=tx, y=0.80, label=paste0("fitval = ",fitval,"   dof = ",dof), color=mcolor[3], hjust=1, size=4) +
-			geom_text(x=tx, y=0.75, label=paste0("fitEquiv = ",r2k), color=mcolor[6], hjust=1, size=4) +
-			geom_text(x=tx, y=0.70, label=paste0("fitNoise = ",pctlist[1]), color=mcolor[1], hjust=1,size=4) + 
-			geom_text(x=tx, y=0.65, label=paste0("Improved fitval Measure"), color=mcolor[4], hjust=1, size=4)
+			geom_text(x=tx, y=0.80, label=paste0("dof = ",dof,"   fitval = ",fitval), 	color=mcolor[3], hjust=1, size=4) +
+			geom_text(x=tx, y=0.75, label=paste0("fitEquiv = ", f), 						color=mcolor[6], hjust=1, size=4) +
+			geom_text(x=tx, y=0.70, label=paste0("fitNoise = ",r2p), 					color=mcolor[1], hjust=1, size=4) + 
+			geom_text(x=tx, y=0.65, label=paste0("pct = ",pctlist[1]), 					color=mcolor[1], hjust=1, size=4) +
+			geom_text(x=tx, y=0.60, label=paste0("Improved fitval Measure"), 			color=mcolor[4], hjust=1, size=4)
 			
 			
 	if(fitmetric=="R2"){plt <- plt +
@@ -779,7 +780,11 @@ fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=3, dist='normal',
 	rownames(df)=c()
 	name.width <- max(sapply(names(df), nchar))
 	format(df, width = name.width, justify = "centre")
-
+	
+	print(paste("Noise Dist:         ",dist))
+	print(paste("Number of Samples:  ", 10^order))
+	print(paste("Degrees of Freedom: ",dof))
+	print(df[,2:4])
 	return(df)
 }
 ##############################################################################################################################
