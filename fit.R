@@ -18,7 +18,7 @@
 #' @export
 #'R2
 R2 <- function(x, y){
-	if(length(x)!=length(y)){stop("r.sq measure: length of x must equal length of y")}
+	if(length(x)!=length(y)){stop("r.sq measure: vector lengths do not match")}
 	xh <- x-mean(x)
 	yh <- y-mean(y)
 	
@@ -27,6 +27,37 @@ R2 <- function(x, y){
 	
 	R2 <- num/den
 	return(R2)
+}
+
+
+##############################################################################################################################
+#
+# The RMSE calculation based on two numeric vectors of equal length
+#
+#
+#' RMSE
+#'
+#' Calculates RMSE given vectors for y and y_pred
+#'
+#' @param y a vector of real numbers
+#' @param y_pred a vector of real numbers
+#'
+#' @return a data frame
+#'
+#' @examples
+#' RMSE(seq(3:20), (seq(3:20)+rnorm(18)^2))
+#'
+#' @export
+#'RMSE
+RMSE <- function(y, y_pred){
+
+	dof		<- length(y)
+	dof_pred	<- length(y_pred)
+	if(dof!=dof_pred){stop("rmse measure: vector lengths do not match")}
+
+	rmse <- sqrt( 1/dof * sum( (y-y_pred)^2 ) )
+
+	return(rmse)
 }
 
 
@@ -233,7 +264,7 @@ return(fitdf)
 
 ##############################################################################################################################
 #
-#	determine the baseline noise level (R2p, fitNoise) for a corresponding number of degrees of freedom(dof) and noise percentile(pct)
+#	determine the baseline noise level (fitNoise) for a corresponding number of degrees of freedom(dof) and noise percentile(pct)
 #
 #
 #' Find The Threshold Noise Level
@@ -489,7 +520,7 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=3, fi
 	if(length(pctlist)>5){stop(paste("Too many percentiles to calculate", length(pctlist)))}
 
 	doflist <- doflist[doflist>1] 
-	doflim <- min(30, length(doflist))
+	doflim <- min(120, length(doflist))
 	doflist <- doflist[1:doflim]
 	
 	pctlim <- min(5,length(pctlist))
