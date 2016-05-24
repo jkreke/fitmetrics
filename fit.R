@@ -184,8 +184,7 @@ ed 		<- e-ep								#predicted ep
 #calculate RMSE numerator
 n1		<- ed*ed							#square the individual elements (not matrix multiplication)
 n1s		<- rowSums(n1)						#sum the individual rows
-n1ss	<- sqrt(n1s)						#sq root of individual elements
-num		<- n1ss								#numerator
+num		<- sqrt(n1s)						#sq root of individual elements -> numerator
 
 #calculate R2 denominator
 den		<- sqrt(dof)						#denominator
@@ -204,8 +203,6 @@ fdf		<- data.frame(fitval=RMSE, pdf, cdf)		#
 
 return(fdf)
 }
-
-
 
 
 ##############################################################################################################################
@@ -236,7 +233,7 @@ return(fdf)
 #'
 #' @export
 #' pcdfs()
-pcdfs <- function(dof, order=6, ndecimals=3, dist='normal', fitmetric="R2", ... ){
+pcdfs <- function(dof, order=6, ndecimals=2, dist='normal', fitmetric="R2", ... ){
 
 if(order>=7){stop(paste("order is too large (10M) -- calculation time too long. Make order<7. Fractions OK."))}
 N=round(10^order,0)
@@ -246,14 +243,16 @@ dN <- dof*N
 rnums <- pnums <- rep(0,dN)
 
 
-if(				dist=="normal")		{	rnums <- rnorm( 	n=dN, ... ); pnums <- rnorm(   n=dN, ... )
-	} else if(	dist=="uniform")		{	rnums <- runif( 	n=dN, ... ); pnums <- runif(   n=dN, ... )
-	} else if(	dist=="lognormal")	{	rnums <- rlnorm(	n=dN, ... ); pnums <- rlnorm(  n=dN, ... )
-	} else if(	dist=="poisson")		{	rnums <- rpois(		n=dN, ... ); pnums <- rpois(   n=dN, ... )
-	} else if(	dist=="binomial")	{	rnums <- rbinom(	n=dN, ... ); pnums <- rbinom(  n=dN, ... )
+           if(	dist=="normal")		{	rnums <- rnorm( n=dN, ... ); pnums <- rnorm(   n=dN, ... )
+	} else if(	dist=="uniform")	{	rnums <- runif( n=dN, ... ); pnums <- runif(   n=dN, ... )
+	} else if(	dist=="lognormal")	{	rnums <- rlnorm(n=dN, ... ); pnums <- rlnorm(  n=dN, ... )
+	} else if(	dist=="chisq")		{	rnums <- rchisq(n=dN, df=dof, ... ); pnums <- rchisq(  n=dN, df=dof, ... )
+		
+	} else if(	dist=="poisson")	{	rnums <- rpois(	n=dN, ... ); pnums <- rpois(   n=dN, ... )
+	} else if(	dist=="binomial")	{	rnums <- rbinom(n=dN, ... ); pnums <- rbinom(  n=dN, ... )
 	}
 
-
+#print(head(data.frame(rnums,pnums)))
 
 if(fitmetric=="R2")		{fitdf <- gen_R2df(		dof, N, bw, rnums, pnums)}
 if(fitmetric=="RMSE")	{fitdf <- gen_RMSEdf(	dof, N, bw, rnums, pnums)}
@@ -285,8 +284,8 @@ return(fitdf)
 #'
 #' @export
 #' fitNoise()
-fitNoise <- function(dof, pct=0.95, ndecimals=3, fitmetric='R2', ...){
-	cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, ...)[,c("fitval","cdf")]
+fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric='R2', dist='normal', ...){
+	cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]
 	if(fitmetric=="RMSE"){
 		c_pct <- as.numeric(1-as.numeric(pct))
 		c_val <- cdf$fitval[cdf$cdf<=c_pct]
@@ -296,7 +295,9 @@ fitNoise <- function(dof, pct=0.95, ndecimals=3, fitmetric='R2', ...){
 		nb <- cdf$fitval[cdf$cdf>=pct][1]		#nb is the value of cdf just at the point where it's just >= p
 	}
 	nb <- nb + rnorm(1)*10^(-(ndecimals+2))  #add a small random number to remove any binning errors.
-	nb <- round(nb,ndecimals)
+	fmt <- paste0("%1.",ndecimals,"f")
+	nb <- as.numeric(sprintf(fmt,nb))
+
 	return(nb)
 }
 
@@ -325,13 +326,14 @@ fitNoise <- function(dof, pct=0.95, ndecimals=3, fitmetric='R2', ...){
 #'
 #' @export
 #' fitEquiv()
-fitEquiv <- function(fitval, dof, pct=0.95, ndecimals=3, fitmetric="R2", ...){
+fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric="R2", ...){
+	fitval=measured_value
 	noiselevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, ...)								#find R2p
 	
 	if(fitmetric=="R2"){
 		eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)			#rescale R2 to where it lies between 1 and baseline noise; add smidge incase r2p=1
 	} else if (fitmetric=="RMSE") {
-		eqfitval <- fitval/noiselevel		
+		eqfitval <- fitval/noiselevel	
 	} else {
 		stop(paste(fitmetric, "is not a valid fitmetric for the fitEquiv routine"))
 	}
@@ -342,8 +344,8 @@ fitEquiv <- function(fitval, dof, pct=0.95, ndecimals=3, fitmetric="R2", ...){
 	nd=rep(0,length(fitval))
 	if(noiselevel-fl>0){
 		nd <- nchar(sapply(strsplit(as.character(noiselevel), ".",fixed=T), "[[", 2))} 
-	eqfitval <- round(eqfitval, ndecimals)
-	
+	fmt <- paste0("%1.",ndecimals,"f")
+	eqfitval <- as.numeric(sprintf(fmt,eqfitval))
 	return(eqfitval)
 }
 
@@ -425,19 +427,19 @@ NoiseTable <- function(doflist=NULL, pctlist=NULL, order=4, ndecimals=2, fitmetr
 #' plotpdf()
 plotpdf <- function(dof, order=4, dist='normal', fitmetric='R2', ...){
 
-df <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
+dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 N = 10^order
 dist2 <- sapply(dist, cap1)
-mxy = max(df$pdf)
-maxx <- max(df$fitval)
-	if(fitmetric=='R2'){fmet   <- expression(R^2)}
-	if(fitmetric=='RMSE'){fmet <- expression(RMSE)}
-plot <- ggplot(df) + 
+mxy = max(dfx$pdf)
+maxx <- max(dfx$fitval)
+	if(fitmetric=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
+	if(fitmetric=='RMSE'){fmet <- expression(RMSE);gtitle="RMSE"}
+plot <- ggplot(dfx) + 
 		geom_point(aes(fitval, pdf),size=1) +
 		ylim(0,mxy) +
 		xlab(fmet) + 
 		ylab("Probability Density") +
-		ggtitle(paste(fitmetric, "Probability Density Function")) +
+		ggtitle(paste(gtitle, "Probability Density Function")) +
 		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",dist2,
 													"\nDegrees of Freedom:",dof,
 													"\nNumber of  Samples:",floor(N))),size=3,hjust=1)
@@ -475,8 +477,8 @@ r2cdf <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 cdf <- NULL													#see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
 N = 10^order
 dist2 <- sapply(dist, cap1)
-	if(fitmetric=='R2'){fmet   <- expression(R^2)}
-	if(fitmetric=='RMSE'){fmet <- expression(RMSE)}
+	if(fitmetric=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
+	if(fitmetric=='RMSE'){fmet <- expression(RMSE);gtitle="RMSE"}
 mxy <- max(r2cdf$cdf)
 maxx <- max(r2cdf$fitval)
 plot <- ggplot(r2cdf) + 
@@ -484,7 +486,7 @@ plot <- ggplot(r2cdf) +
 		ylim(0,mxy) + 
 		xlab(fmet) + 
 		ylab("Cumulative Probability") +
-		ggtitle(paste(fitmetric,"Cumulative Probability Density Function")) +
+		ggtitle(paste(gtitle,"Cumulative Probability Density Function")) +
 		geom_text(aes(x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",dist2,
 													"\nDegrees of Freedom:",dof,
 													"\nNumber of  Samples:",floor(N))),size=3,hjust=1)
@@ -516,7 +518,7 @@ return(plot)
 #'
 #' @export
 #' plotNoise()
-plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=3, fitmetric='R2', ...){
+plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fitmetric='R2', ...){
 	if(length(pctlist)>5){stop(paste("Too many percentiles to calculate", length(pctlist)))}
 
 	doflist <- doflist[doflist>1] 
@@ -538,10 +540,14 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=3, fi
 	N = 10^order
 	plt <- ggplot(r2pdf)
 
-	maintitle <- "Baseline Noise Level\nfor Various Noise Percentiles (p)"
-	if(fitmetric=='R2'){fmet   <- expression(R^2)}
-	if(fitmetric=='RMSE'){fmet <- expression(RMSE)}
-	gtitle <- paste(fmet,maintitle)
+	if(length(pctlist)==1){maintitle <- paste("Baseline Noise Level\nfor One Noise Percentile(p)")
+						} else {
+						maintitle <- paste("Baseline Noise Level\nfor Various Noise Percentiles(p)")
+						}
+	if(fitmetric=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
+	if(fitmetric=='RMSE'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
+	gtitle <- fmet
+
 
 	if(pctlength>=1){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(r2pdf)), r2pdf[,1]), color=mcolor[1], size=sizes[1])  +
@@ -562,8 +568,8 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=3, fi
 	plt <- plt + 
 	ggtitle(gtitle) +
 	xlab("Degrees of Freedom") +
-	ylab(fmet) +
-	geom_text(aes(x=max(doflist), y=mxy-0.25, label=paste0("Number of Samples:",N)), color='black', hjust=1, size=3)
+	ylab(ylb) +
+	geom_text(aes(x=max(doflist), y=mxy+0.05, label=paste0("Number of Samples = ",N)), color='black', hjust=1, size=4)
 
 	
 	return(plt)
@@ -596,34 +602,35 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=3, fi
 #'
 #' @export
 #' plotConstValue()
-plotConstValue <- function(fitval, doflist=c(2:30), pct=0.95, order=4, ndecimals=3, fitmetric='R2', ...){
+plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, ndecimals=2, fitmetric='R2', ...){
+	fitval=measured_value
 
 	pct <- pct[1]										#ensure only one pct is used
-	df <- NoiseTable(doflist=doflist, pctlist=pct, order=order, ndecimals=ndecimals, fitmetric=fitmetric, ...)
+	dfx <- NoiseTable(doflist=doflist, pctlist=pct, order=order, ndecimals=ndecimals, fitmetric=fitmetric, ...)
 
-	df$fitEquiv <- NA
+	dfx$fitEquiv <- NA
 
-	n <- nrow(df)
+	n <- nrow(dfx)
 
-	for(i in 1:n){df$fitEquiv[i] <- fitEquiv(fitval, dof=as.numeric(row.names(df)[i]), pct=pct, ndecimals=ndecimals, order=order, fitmetric=fitmetric, ...)}
-	if(fitmetric=="R2"){ylb=expression(R^2)}
-	if(fitmetric=="RMSE"){ylb=expression(RMSE)}
+	for(i in 1:n){dfx$fitEquiv[i] <- fitEquiv(fitval, dof=as.numeric(row.names(dfx)[i]), pct=pct, ndecimals=ndecimals, order=order, fitmetric=fitmetric, ...)}
+	if(fitmetric=="R2"){gtitle = "R-squared"; ylb   <- expression(R^2)}
+	if(fitmetric=="RMSE"){gtitle = "RMSE"; ylb <- expression(RMSE)}
 	maxx		<- max(doflist)	
-	mxy		<- max(df[,1],df$fitEquiv,fitval)
-	miny		<- min(df[,1],df$fitEquiv,fitval)
+	mxy			<- max(dfx[,1],dfx$fitEquiv,fitval)
+	miny		<- min(dfx[,1],dfx$fitEquiv,fitval)
 	if(fitmetric=="R2"){miny=0}
 	else{miny		<- max(miny,-10)}
-	eqy <- df$fitEquiv[row.names(df)==maxx]
-	pcy	<- df[row.names(df)==maxx,1]
-	plot <- ggplot(df) + 
-		geom_point(aes(as.numeric(row.names(df)),df[,1]),color='red') + 		#column df[,1] is named for the pct used, which can change every time.
-		geom_point(aes(as.numeric(row.names(df)),fitEquiv),color='blue',na.rm=T) + 
+	eqy <- dfx$fitEquiv[row.names(dfx)==maxx]
+	pcy	<- dfx[row.names(dfx)==maxx,1]
+	plot <- ggplot(dfx) + 
+		geom_point(aes(as.numeric(row.names(dfx)),dfx[,1]),color='red') + 		#column dfx[,1] is named for the pct used, which can change every time.
+		geom_point(aes(as.numeric(row.names(dfx)),fitEquiv),color='blue',na.rm=T) + 
 		geom_hline(aes(yintercept=fitval),color='black') + 
 		ylim(miny,mxy) +
 		xlab("Degrees of Freedom") +
 		ylab(ylb) +
-		ggtitle(paste(fitmetric, "Noise Baseline and Equivalent Measure \nwith Constant Measured Value")) +
-		geom_text(aes(x=maxx, y=(pcy-0.05)),		label=paste0("Baseline Noise Level\npercentile = ",pct*100), 	color='red',  hjust=1) + 
+		ggtitle(paste(gtitle, "Noise Baseline and Equivalent Measure\nwith Constant Measured Value")) +
+		geom_text(aes(x=maxx, y=(pcy-0.05)),		label=paste0("Baseline Noise Level\npercentile = ",pct*100,"%"), 	color='red',  hjust=1) + 
 		geom_text(aes(x=maxx, y=(eqy-0.05)),		label=paste0("Equivalent Value"), 				color='blue', hjust=1) +
 		geom_text(aes(x=maxx, y=(fitval+0.05)),	label=paste0("Measured Value = ",fitval), 		color='black',hjust=1)
 	
@@ -661,23 +668,23 @@ plotConstValue <- function(fitval, doflist=c(2:30), pct=0.95, order=4, ndecimals
 #'
 #' @export
 #' plotConstNoise()
-plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetric='R2', ...){
-
+plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F, fitmetric='R2', ...){
+	fitval=measured_value
 	mcolor <- c("red", "blue", "forestgreen", "slategray4", "gray20", "black")
 
 
 	# get the pcdf for this dof
-	df <- pcdfs(dof=dof, order=order, fitmetric=fitmetric, ...)
+	dfx <- pcdfs(dof=dof, order=order, fitmetric=fitmetric, ...)
 	
 	doflist = c(2:30)
 	pctlist = c(pct)
 	
 	
-	# this will add a plot of points that follow the curve where the pct equals fitval -- just to show the probability of noise for this R2.
+	# this will add a plot of points that follow the curve where the pct equals measured_value(aka fitval) -- just to show the probability of noise for this R2.
 
-	# using that df, find the closest df$R2 (aka pct) to the given fitvalue, or pct_r2
+	# using that dfx, find the closest dfx$R2 (aka pct) to the given fitval, or pct_r2
 	if(plot_pctr2){
-		pct_fv <- df$cdf[df$fitval>=fitval][1]
+		pct_fv <- dfx$cdf[dfx$fitval>=fitval][1]
 		pctlist=c(pctlist,pct_fv)			#take out if not plotting pct_R2.  Comprising pct and pct_R2
 		}
 
@@ -688,27 +695,47 @@ plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetr
 
 	r2p <- ptable[(dof-1),1]			#column 1 is the r2p values
 	r2k <- fitEquiv(fitval,dof=dof,...)		#find the r2k value for this dof (single number)
-	if(fitmetric=="R2"){	f = fitEquiv(fitval,dof,pct,fitmetric="R2");		ylb=expression(R^2);	ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]}
-	if(fitmetric=="RMSE"){	f = fitEquiv(fitval,dof,pct,fitmetric="RMSE");	ylb=expression(RMSE);	ptable$fitEquiv <- f*(ptable[,1])}
+	if(fitmetric=="R2"){	f = fitEquiv(fitval,dof,pct,fitmetric="R2");	ylb=expression(R^2);	  gtitle="R-squared"; ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]}
+	if(fitmetric=="RMSE"){	f = fitEquiv(fitval,dof,pct,fitmetric="RMSE");	ylb=expression(RMSE); gtitle="RMSE";    	  ptable$fitEquiv <- f*(ptable[,1])}
 
 	tx = max(doflist[doflength])
-
+	ttx = 2/3*tx
 	if(length(ptable)==3){ptable <- ptable[c(1,3,2)]}	#ensure proper order of columns;  if pct_r2=T, then swap 2<->3 to keep R2Equiv in pos 2
+
+
+	bline <- floor(2/3*nrow(ptable))
+	hib <- max(ptable[bline,1], ptable[bline,2])
+	lob <- min(ptable[bline,1], ptable[bline,2])
+	
+	bscale=max(ptable[,1],ptable[,2]) - min(ptable[,1],ptable[,2])
+	tv=0.9
+	if(hib<0.6*bscale){tv=0.95}
+	if(lob>0.3*bscale){tv=0.38}
+	if((hib-lob)*bscale>0.5){tv=hib-0.05}
+	
+	
+	tval <- tv-seq(0,0.4,by=0.05)*bscale
 
 	
 	plt <- ggplot(ptable) +
-			geom_point(aes(as.numeric(row.names(ptable)),ptable[,1]),shape=1, color=mcolor[1],size=2,na.rm=T) +
-			geom_point(aes(as.numeric(row.names(ptable)),ptable[,2]),shape=16,color=mcolor[6],size=2,na.rm=T) +
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval), shape=8, color=mcolor[3],size=5,na.rm=T) + 
+			geom_point(aes(as.numeric(row.names(ptable)),ptable[,2]),shape=16,color=mcolor[6],size=2,na.rm=T) +
 			geom_point(data=data.frame(r2p, dof),   aes(dof,r2p),    shape=16,color=mcolor[1],size=3,na.rm=T) +
-			ggtitle(paste(fitmetric, "Noise Baseline and Equivalent Measure \nwith Constant Noise Level")) +
+			geom_point(aes(as.numeric(row.names(ptable)),ptable[,1]),shape=1, color=mcolor[1],size=2,na.rm=T) +
+			ggtitle(paste(gtitle, "Noise Baseline and Equivalent Measure \nwith Constant Noise Level")) +
 			xlab("Degrees of Freedom") +
 			ylab(ylb) + 
-			geom_text(x=tx, y=0.80, label=paste0("dof = ",dof,"   fitval = ",fitval), 	color=mcolor[3], hjust=1, size=4) +
-			geom_text(x=tx, y=0.75, label=paste0("fitEquiv = ", f), 						color=mcolor[6], hjust=1, size=4) +
-			geom_text(x=tx, y=0.70, label=paste0("fitNoise = ",r2p), 					color=mcolor[1], hjust=1, size=4) + 
-			geom_text(x=tx, y=0.65, label=paste0("pct = ",pctlist[1]), 					color=mcolor[1], hjust=1, size=4) +
-			geom_text(x=tx, y=0.60, label=paste0("Improved fitval Measure"), 			color=mcolor[4], hjust=1, size=4)
+			geom_text(x=ttx, y=tval[1], label=paste0("dof = ",dof,", measured value = ",fitval), 	color=mcolor[3], hjust=0, size=4) +
+			geom_text(x=ttx, y=tval[2], label=paste0("fitEquiv = ", f), 							color=mcolor[6], hjust=0, size=4) +
+			geom_text(x=ttx, y=tval[3], label=paste0("fitNoise = ",r2p), 							color=mcolor[1], hjust=0, size=4) + 
+			geom_text(x=ttx, y=tval[4], label=paste0("percentile = ",100*pctlist[1],"%"), 			color=mcolor[1], hjust=0, size=4) +
+			geom_text(x=ttx, y=tval[5], label=paste0("Improved Measure (light area)"), 				color=mcolor[4], hjust=0, size=4) +
+			
+			geom_point(data=data.frame(x=ttx-0.5, y=tval[1]), aes(x,y), shape=8,  color=mcolor[3], size=5) + 
+			geom_point(data=data.frame(x=ttx-0.5, y=tval[2]), aes(x,y), shape=16, color=mcolor[6], size=2) +
+			geom_point(data=data.frame(x=ttx-0.5, y=tval[3]), aes(x,y), shape=16, color=mcolor[1], size=3) +
+			geom_point(data=data.frame(x=ttx-0.5, y=tval[4]), aes(x,y), shape=1,  color=mcolor[1], size=2)
+			
 			
 			
 	if(fitmetric=="R2"){plt <- plt +
@@ -723,19 +750,19 @@ plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetr
 	#if pct_r2 is T, plot the noise level where pct=fitval
 	if(plot_pctr2){plt <- plt + 
 			geom_point(aes(as.numeric(row.names(ptable)),ptable[,3]),color=mcolor[2],size=2) +
-			geom_text(x=tx, y=0.60, label=paste0(fitmetric," Noise Percentile = ",pctlist[2]), color=mcolor[2], hjust=1,size=4,na.rm=T)}
+			geom_text(x=ttx, y=tval[7], label=paste0(fitmetric," Noise Percentile = ",pctlist[2]), color=mcolor[2], hjust=0,size=4,na.rm=T)}
 	
 	#if fitval is in the noise, show the improved but still noisy R2 values in a black ribbon.
 	if(any(ptable[,2]<ptable[,1]) & fitmetric=="R2"){ plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=ptable[,1]),fill=mcolor[5],alpha=0.7,na.rm=T) +
-			geom_text(x=tx, y=0.55, label=paste0("Unacceptable Noise"), color=mcolor[5], hjust=1, size=4) +
+			geom_text(x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }			
 			
 	#if fitval is in the noise, show the improved but still noisy RMSE values in a black ribbon.
 	if(any(ptable[,2]>ptable[,1]) & fitmetric=="RMSE"){ plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,1], ymax=ptable[,2]),fill=mcolor[5],alpha=0.7,na.rm=T) +
-			geom_text(x=tx, y=0.55, label=paste0("Unacceptable Noise"), color=mcolor[5], hjust=1, size=4) +
-			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }			
+			geom_text(x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
+			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }				
 
 	return(plt)
 	#return(ppp)
@@ -766,26 +793,26 @@ plotConstNoise <- function(fitval, dof, pct=0.95, order=4, plot_pctr2=F, fitmetr
 #'
 #' @export
 #' fitStats()
-fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=3, dist='normal', order=5, ... ) {
+fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist='normal', order=5, ... ) {
 
 	o=order
 	nsamples = 10^order
 	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='R2',  dist=dist, ndecimals=ndecimals,...)
-	RMSEceilings		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='RMSE',dist=dist, ndecimals=ndecimals,...)	
+	RMSEceilings	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='RMSE',dist=dist, ndecimals=ndecimals,...)	
 	
 	np = length(pctlist)
 	r2b= unlist(R2baselines[1,])
 	rmsec = unlist(RMSEceilings[1,])
-	df <- data.frame(dof=rep(dof,np),percentiles=paste0(pctlist*100,"%"),R2=r2b,RMSE=rmsec)
-	rownames(df)=c()
-	name.width <- max(sapply(names(df), nchar))
-	format(df, width = name.width, justify = "centre")
+	dfx <- data.frame(dof=rep(dof,np),percentiles=paste0(pctlist*100,"%"),R2=r2b,RMSE=rmsec)
+	rownames(dfx)=c()
+	name.width <- max(sapply(names(dfx), nchar))
+	format(dfx, width = name.width, justify = "centre")
 	
 	print(paste("Noise Dist:         ",dist))
 	print(paste("Number of Samples:  ", 10^order))
 	print(paste("Degrees of Freedom: ",dof))
-	print(df[,2:4])
-	return(df)
+
+	return(dfx)
 }
 ##############################################################################################################################
 #
@@ -793,12 +820,51 @@ fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=3, dist='normal',
 #
 #
 #
-fit <- function(measured_value, dof, fitmetric, order=6, ndecimals=2, ... ){
-	df <- pcdfs(dof,fitmetric=fitmetric,order=order,...)
-	if(fitmetric=="R2"){current_percentile <- df$cdf[df$fitval>=measured_value][1]}  #list all cdfs where fitval>=measured and take first one in the list
+fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, dist='normal', table=TRUE, ... ){
+	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
+	if(fitmetric=="R2"){
+		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
+		}
 	if(fitmetric=="RMSE"){
-		df$fitval_rev <- rev(df$fitval)
-		current_percentile <- df$cdf[df$fitval_rev<measured_value][1]}
-		current_percentile <- sprintf("%1.2f%%", 100*current_percentile)
-	return(current_percentile)
+		dfx$fitval_rev <- rev(dfx$fitval)
+		current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
+		}
+	
+	fmt <- paste0("%1.",ndecimals,"f")
+		
+	if(table){
+	tmv<-"Measured Value:"
+	vmv<-measured_value
+	
+	tdof<- "Degrees of Freedom:"
+	vdof<- dof
+	
+	tfitmetric <- "Fit Metric:"
+	vfitmetric <- fitmetric
+	
+	tdpct <- "Min Acceptable Noise Percentile:"
+	vdpct <- sprintf(fmt, pct)
+	
+	tapct <- "Calculated Noise Percentile:"
+	vapct <- sprintf(fmt, current_percentile)
+	
+	tnsamples <- "Number of Samples:"
+	vnsamples <- 10^order
+	
+	tdist <- "Noise Distribution:"
+	vdist <- dist
+	
+	tfiteq <- "Fit Equivalent Value:"
+	feq    <- fitEquiv(fitval=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
+	vfiteq <- sprintf(fmt, feq) #, "@", sprintf("%1.2f%%", 100 * pct))
+	
+
+	outdf <- data.frame(Parameter	=c(tfitmetric,tdof,tdist,tnsamples,tmv,tdpct,tapct,tfiteq), 
+						Value		=c(vfitmetric,vdof,vdist,vnsamples,vmv,vdpct,vapct,vfiteq)
+						)
+
+	#row.names(outdf) <- ""
+	}
+	
+	if(table){return(outdf)} else {return(cat(sprintf(fmt,current_percentile)))}
 }
