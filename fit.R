@@ -7,37 +7,79 @@
 #'
 #' Calculates R-squared given vectors for x and y
 #'
-#' @param x a vector of real numbers
-#' @param y a vector of real numbers
+#' @param x a vector or matrix of real numbers
+#' @param y a vector or matrix of real numbers
 #'
 #' @return a data frame
 #'
 #' @examples
-#' R2( seq(2:10),(3*seq(2:10)+4) )
+#' R2( seq(2:10),(3*rnorm(2:10)+4) )
 #'
 #' @export
 #'R2
 R2 <- function(x, y){
-	if(length(x)!=length(y)){stop("r.sq measure: vector lengths do not match")}
-	xh <- x-mean(x)
-	yh <- y-mean(y)
 	
-	num <- sum(xh*yh)^2
-	den <- sum(xh^2)*sum(yh^2)
+	gclasses <- c("numeric", "integer")
+	if(class(x) %in% gclasses & class(y) %in% gclasses & length(x)==length(y)){
+		x <- matrix(x,nrow=1)
+		y <- matrix(y,nrow=1)
+		} else if(class(x)=="matrix" & class(y)=="matrix"){
+			
+			
+		} else {
+			stop("x & y classes or lengths different")
+		}
+	if(ncol(x)==1 | ncol(y)==1){stop("can not compute R2 with only on value")}
+
+	if(class(x)     == "matrix" & 
+	   class(y)     == "matrix"  &
+	   dim(x)[[1]]  == dim(y)[[1]]  & 
+	   dim(x)[[2]]  == dim(y)[[2]]
+	   ){		
+		N=dim(x)[[1]]
+		dof=dim(x)[[2]]
+		}
 	
-	R2 <- num/den
-	return(R2)
+	
+	#define R2 components x and y				
+	xb		<- rowSums(x)/dof
+	xd		<- x-xb
+
+	yb 		<- rowSums(y)/dof					#get means for each row
+	yd 		<- y-yb								#get delta
+
+	#calculate R2 numerator
+	n1		<- xd*yd
+	n1s		<- rowSums(n1)
+	num		<- n1s*n1s							#numerator
+
+	#calculate R2 denominator
+	d1		<- xd^2
+	d2		<- yd^2
+	d1s		<- rowSums(d1)
+	d2s		<- rowSums(d2)
+	den		<- d1s*d2s							#denominator
+
+	#calculate R2 (this is an array of R2 calculations based on noise)
+	R2vector	<- num/den						#R2
+	
+	
+	
+	return(R2vector)
+	
+	
 }
+
 
 
 ##############################################################################################################################
 #
-# The RMSE calculation based on two numeric vectors of equal length
+# The rmse calculation based on two numeric vectors of equal length
 #
 #
-#' RMSE
+#' rmse
 #'
-#' Calculates RMSE given vectors for y and y_pred
+#' Calculates rmse given vectors for y and y_pred
 #'
 #' @param y a vector of real numbers
 #' @param y_pred a vector of real numbers
@@ -45,21 +87,54 @@ R2 <- function(x, y){
 #' @return a data frame
 #'
 #' @examples
-#' RMSE(seq(3:20), (seq(3:20)+rnorm(18)^2))
+#' rmse(seq(3:20), (seq(3:20)+rnorm(18)^2))
 #'
 #' @export
-#'RMSE
-RMSE <- function(y, y_pred){
+#'rmse
+rmse <- function(obs, mdl){
+	#need to know if these are vectors of numbers or matrices
+	#need to know that they're the same dimensions
+	#need to know which dimension is dof and which is N
+	#if vectors, convert to matricies
 
-	dof		<- length(y)
-	dof_pred	<- length(y_pred)
-	if(dof!=dof_pred){stop("rmse measure: vector lengths do not match")}
+	gclasses=c("numeric", "integer")
+	if(class(obs) %in% gclasses & class(mdl) %in% gclasses & length(obs)==length(mdl)){
+		obs <- matrix(obs,nrow=1)
+		mdl <- matrix(mdl,nrow=1)
+		} else if(class(obs)=="matrix" & class(mdl)=="matrix"){
+			
+			
+		} else {
+			stop("obs and mdl classes or lengths different")
+		}
 
-	rmse <- sqrt( 1/dof * sum( (y-y_pred)^2 ) )
 
-	return(rmse)
+	if(class(obs)     == "matrix" & 
+	   class(mdl)     == "matrix"  &
+	   dim(obs)[[1]]  == dim(mdl)[[1]]  & 
+	   dim(obs)[[2]]  == dim(mdl)[[2]]
+	   ){		
+		N=dim(obs)[[1]]
+		dof=dim(obs)[[2]]
+		}
+
+	#get delta
+	ed 		<- obs-mdl								#predicted ep									
+
+	#calculate RMSE numerator
+	n1		<- ed*ed							#square the individual elements (not matrix multiplication)
+	n1s		<- rowSums(n1)						#sum the individual rows
+	num		<- sqrt(n1s)						#sq root of individual elements -> numerator
+
+	#calculate RMSE denominator
+	den		<- sqrt(dof)						#denominator
+
+	#calculate rmse (this is an array of rmse calculations based on noise)
+	rmsevector	<- num/den
+
+	return(rmsevector)
+
 }
-
 
 ##############################################################################################################################
 #
@@ -107,36 +182,14 @@ cap1 <- function(x) {
 #'
 #' @export
 #' gen_R2df()
-gen_R2df <- function(dof, N, bw, rnums, pnums){
+gen_R2df <- function(dof, N, bw, obs, mdl){
 
 
-#initialize basic variables
-R2c 	<- rep(0,N)
+#establish matricies
+x		<- matrix(mdl, nrow=N, ncol=dof)
+y  		<- matrix(obs, nrow=N, ncol=dof)	#make a matrix of N rows by n columns
 
-#define R2 components x and y (y is just e, residuals, random numbers)				
-x  		<- seq(1,dof)
-xb 		<- mean(x)
-xd 		<- x-xb
-xd 		<- t(matrix(rep(xd, N), nrow=dof, ncol=N))
-
-e  		<- matrix(rnums, nrow=N, ncol=dof)	#make a matrix of N rows by n columns
-eb 		<- rowSums(e)/dof					#get means for each row
-ed 		<- e-eb								#get delta
-
-#calculate R2 numerator
-n1		<- xd*ed
-n1s		<- rowSums(n1)
-num		<- n1s*n1s							#numerator
-
-#calculate R2 denominator
-d1		<- xd^2
-d2		<- ed^2
-d1s		<- rowSums(d1)
-d2s		<- rowSums(d2)
-den		<- d1s*d2s							#denominator
-
-#calculate R2 (this is an array of R2 calculations based on noise)
-R2c		<- num/den							#R2
+R2c <- R2(x,y)
 
 #separate R2s into bins of width bw (histogram R2) to get pdf.  sum pdf to get cdf.
 br		<- seq(0, 1, by=bw)
@@ -153,10 +206,10 @@ return(fdf)
 
 ##############################################################################################################################
 #
-# generate the pdf and cdf for the RMSE function
+# generate the pdf and cdf for the rmse function
 #
 #
-#' Generate RMSE data frame of pdf and cdf values
+#' Generate rmse data frame of pdf and cdf values
 #'
 #' Builds the pdf and cdf data frame based on random numbers generated from a specific noise distribution
 #'
@@ -169,40 +222,75 @@ return(fdf)
 #' @return a data frame
 #'
 #' @export
-#' gen_RMSEdf()
-gen_RMSEdf <- function(dof, N, bw, rnums, pnums){
+#' gen_rmsedf()
+gen_rmsedf <- function(dof, N, bw, obs, mdl){
+
+#establish matricies
+obs <- matrix(obs,ncol=dof)
+mdl <- matrix(mdl,ncol=dof)
+
+#call RMSE function
+rmsec 	<- rmse(obs,mdl)
 
 
-#initialize basic variables
-RMSEc	<- rep(0,N)
-
-#define RMSE components - residuals.  Both observed and predicted (model) are just random numbers				
-e  		<- matrix(rnums, nrow=N, ncol=dof)	#make a matrix of N rows by dof columns (observation)
-ep 		<- matrix(pnums, nrow=N, ncol=dof)	#make a matrix of N rows by dof columns (model)
-ed 		<- e-ep								#predicted ep									
-
-#calculate RMSE numerator
-n1		<- ed*ed							#square the individual elements (not matrix multiplication)
-n1s		<- rowSums(n1)						#sum the individual rows
-num		<- sqrt(n1s)						#sq root of individual elements -> numerator
-
-#calculate R2 denominator
-den		<- sqrt(dof)						#denominator
-
-#calculate RMSE (this is an array of RMSE calculations based on noise)
-RMSEc	<- num/den							#RMSE
-
-
-#separate RMSEs into bins of width bw (histogram RMSE) to get pdf.  sum pdf to get cdf.
-br		<- seq(0, c(max(RMSEc)+bw), by=bw)	#add an extra bin in case elements fall on the upper bound
-RMSE	<- br[2:length(br)]					#RMSE values (bins)
-RMSEh	<- hist(RMSEc, breaks=br, plot=F)	#histogrammed RMSE
-pdf		<- RMSEh$counts/sum(RMSEh$counts)	#prob density
+#separate RMSEs into bins of width bw (histogram rmse) to get pdf.  sum pdf to get cdf.
+br		<- seq(0, c(max(rmsec)+bw), by=bw)	#add an extra bin in case elements fall on the upper bound
+rmse	<- br[2:length(br)]					#RMSE values (bins)
+rmseh	<- hist(rmsec, breaks=br, plot=F)	#histogrammed rmse
+pdf		<- rmseh$counts/sum(rmseh$counts)	#prob density
 cdf		<- cumsum(pdf)						#cumulative probability density
-fdf		<- data.frame(fitval=RMSE, pdf, cdf)		#
+fdf		<- data.frame(fitval=rmse, pdf, cdf)		#
 
 return(fdf)
 }
+
+
+
+##############################################################################################################################
+#
+# generate the pdf and cdf for the user function
+#
+#
+#' Generate vector of values used to build pdf and cdf
+#'
+#' Calculates the user function output with the frequencies of each possible outcome to width bw.
+#'
+#' @param dof an integer
+#' @param N an integer
+#' @param bw a real number describing the bin width
+#' @param obs a vector of random numbers dof*N long
+#' @param mdl a vector of random numbers dof*N long
+#' @param user a function created by the user that accepts two matricies of numbers N x dof (rows x cols)
+#'
+#' @return a vector of numbers
+#'
+#' @examples
+#' user <- function(m1,m2){K <- rep(NA,nrow(m1));for(i in 1:nrow(m1)){K[i]<-cor(m1[i,],m2[i,])^2};return(K)}
+#' plotpdf(dof=3,fitmetric="user",order=5)
+#' plotpdf(dof=3,fitmetric="R2",order=5) #for comparison
+#'
+#' @export
+#' gen_userdf()
+gen_userdf <- function(dof, N, bw, obs, mdl){
+
+#establish matrices
+obs <- matrix(obs, nrow=N, ncol=dof)
+mdl <- matrix(mdl, nrow=N, ncol=dof)
+
+#call user-defined function
+userc <- user(obs, mdl)
+
+#separate user measures into bins of width bw (histogram user) to get pdf.  sum pdf to get cdf.
+br		<- seq(c(min(userc)), c(max(userc)+bw), by=bw)	#add an extra bin in case elements fall on the upper bound
+user	<- br[2:length(br)]					#user values (bins)
+userh	<- hist(userc, breaks=br, plot=F)	#histogrammed user
+pdf		<- userh$counts/sum(userh$counts)	#prob density
+cdf		<- cumsum(pdf)						#cumulative probability density
+fdf		<- data.frame(fitval=user, pdf, cdf)		#
+
+return(fdf)
+}
+
 
 
 ##############################################################################################################################
@@ -240,22 +328,23 @@ N=round(10^order,0)
 bw=1/10^ndecimals #bin width
 
 dN <- dof*N
-rnums <- pnums <- rep(0,dN)
+rnums1 <- rnum2 <- rep(0,dN)
 
 
-           if(	dist=="normal")		{	rnums <- rnorm( n=dN, ... ); pnums <- rnorm(   n=dN, ... )
-	} else if(	dist=="uniform")	{	rnums <- runif( n=dN, ... ); pnums <- runif(   n=dN, ... )
-	} else if(	dist=="lognormal")	{	rnums <- rlnorm(n=dN, ... ); pnums <- rlnorm(  n=dN, ... )
-	} else if(	dist=="chisq")		{	rnums <- rchisq(n=dN, df=dof, ... ); pnums <- rchisq(  n=dN, df=dof, ... )
+           if(	dist=="normal")		{	rnums1 <- rnorm( n=dN, ... );         rnums2 <- rnorm(   n=dN, ... )
+	} else if(	dist=="uniform")	{	rnums1 <- runif( n=dN, ... );         rnums2 <- runif(   n=dN, ... )
+	} else if(	dist=="lognormal")	{	rnums1 <- rlnorm(n=dN, ... );         rnums2 <- rlnorm(  n=dN, ... )
+	} else if(	dist=="chisq")		{	rnums1 <- rchisq(n=dN, df=dof, ... ); rnums2 <- rchisq(  n=dN, df=dof, ... )
 		
-	} else if(	dist=="poisson")	{	rnums <- rpois(	n=dN, ... ); pnums <- rpois(   n=dN, ... )
-	} else if(	dist=="binomial")	{	rnums <- rbinom(n=dN, ... ); pnums <- rbinom(  n=dN, ... )
+	} else if(	dist=="poisson")	{	rnums1 <- rpois( n=dN, ... );         rnums2 <- rpois(   n=dN, ... )
+	} else if(	dist=="binomial")	{	rnums1 <- rbinom(n=dN, ... );         rnums2 <- rbinom(  n=dN, ... )
 	}
 
-#print(head(data.frame(rnums,pnums)))
 
-if(fitmetric=="R2")		{fitdf <- gen_R2df(		dof, N, bw, rnums, pnums)}
-if(fitmetric=="RMSE")	{fitdf <- gen_RMSEdf(	dof, N, bw, rnums, pnums)}
+
+if(fitmetric=="R2")		{fitdf <- gen_R2df(   dof, N, bw, rnums1, rnums2)}
+if(fitmetric=="rmse")	{fitdf <- gen_RMSEdf( dof, N, bw, rnums1, rnums2)}
+if(fitmetric=="user")	{fitdf <- gen_userdf( dof, N, bw, rnums1, rnums2)}
 
 return(fitdf)
 }
@@ -285,19 +374,24 @@ return(fitdf)
 #' @export
 #' fitNoise()
 fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric='R2', dist='normal', ...){
-	cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]
-	if(fitmetric=="RMSE"){
-		c_pct <- as.numeric(1-as.numeric(pct))
-		c_val <- cdf$fitval[cdf$cdf<=c_pct]
-		c_val <- rev(c_val)
-		nb <- c_val[1]
-	} else {
-		nb <- cdf$fitval[cdf$cdf>=pct][1]		#nb is the value of cdf just at the point where it's just >= p
-	}
-	nb <- nb + rnorm(1)*10^(-(ndecimals+2))  #add a small random number to remove any binning errors.
-	fmt <- paste0("%1.",ndecimals,"f")
-	nb <- as.numeric(sprintf(fmt,nb))
+	
+	if(fitmetric=='userx'){nb="can't compute"
+		} else {
+		cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]
+		if(fitmetric=="rmse"){
+			c_pct <- as.numeric(1-as.numeric(pct))
+			c_val <- cdf$fitval[cdf$cdf<=c_pct]
+			c_val <- rev(c_val)
+			nb <- c_val[1]
 
+		} else {
+			nb <- cdf$fitval[cdf$cdf>=pct][1]		#nb is the value of cdf just at the point where it's just >= p
+		}
+		nb <- nb + rnorm(1)*10^(-(ndecimals+2))  #add a small random number to remove any binning errors.
+		fmt <- paste0("%1.",ndecimals,"f")
+		nb <- as.numeric(sprintf(fmt,nb))
+	
+		}
 	return(nb)
 }
 
@@ -328,12 +422,20 @@ fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric='R2', dist='normal', 
 #' fitEquiv()
 fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric="R2", ...){
 	fitval=measured_value
+	if(fitmetric=='user'){
+	eqfitval="cant compute"		
+		
+	} else {
 	noiselevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, ...)								#find R2p
+
 	
 	if(fitmetric=="R2"){
 		eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)			#rescale R2 to where it lies between 1 and baseline noise; add smidge incase r2p=1
-	} else if (fitmetric=="RMSE") {
-		eqfitval <- fitval/noiselevel	
+	} else if (fitmetric=="rmse") {
+		eqfitval <- fitval/noiselevel
+	} else if (fitmetric=="user") {
+		eqfitval <- fitval/noiselevel
+		eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)
 	} else {
 		stop(paste(fitmetric, "is not a valid fitmetric for the fitEquiv routine"))
 	}
@@ -346,6 +448,7 @@ fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric="R2",
 		nd <- nchar(sapply(strsplit(as.character(noiselevel), ".",fixed=T), "[[", 2))} 
 	fmt <- paste0("%1.",ndecimals,"f")
 	eqfitval <- as.numeric(sprintf(fmt,eqfitval))
+	}
 	return(eqfitval)
 }
 
@@ -393,12 +496,12 @@ NoiseTable <- function(doflist=NULL, pctlist=NULL, order=4, ndecimals=2, fitmetr
 	colnams = as.character(pctlist)
 	
 	shell <- matrix(nrow=nds, ncol=nps)
-	r2ptab <- matrix(mapply(function(x,i,j) fitNoise(doflist[i], pctlist[j], order=order, ndecimals=ndecimals, fitmetric=fitmetric, ...), shell,row(shell),col(shell)), nrow=nds, ncol=nps)
+	noisetab <- matrix(mapply(function(x,i,j) fitNoise(doflist[i], pctlist[j], order=order, ndecimals=ndecimals, fitmetric=fitmetric, ...), shell,row(shell),col(shell)), nrow=nds, ncol=nps)
 
-	r2ptab <- as.data.frame(r2ptab)
-	colnames(r2ptab) <- colnams
-	rownames(r2ptab) <- rownams
-	return(r2ptab)
+	noisetab <- as.data.frame(noisetab)
+	colnames(noisetab) <- colnams
+	rownames(noisetab) <- rownams
+	return(noisetab)
 }
 
 
@@ -433,7 +536,8 @@ dist2 <- sapply(dist, cap1)
 mxy = max(dfx$pdf)
 maxx <- max(dfx$fitval)
 	if(fitmetric=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
-	if(fitmetric=='RMSE'){fmet <- expression(RMSE);gtitle="RMSE"}
+	if(fitmetric=='rmse'){fmet <- expression(RMSE);gtitle="RMSE"}
+	if(fitmetric=="user"){fmet <- expression(user);gtitle="user"}
 plot <- ggplot(dfx) + 
 		geom_point(aes(fitval, pdf),size=1) +
 		ylim(0,mxy) +
@@ -467,7 +571,7 @@ return(plot)
 #' @return ggplot object
 #'
 #' @examples
-#' plotcdf(5, dist='uniform', fitmetric='RMSE')
+#' plotcdf(5, dist='uniform', fitmetric='rmse')
 #'
 #' @export
 #' plotcdf()
@@ -478,7 +582,8 @@ cdf <- NULL													#see http://stackoverflow.com/questions/9439256/how-can-
 N = 10^order
 dist2 <- sapply(dist, cap1)
 	if(fitmetric=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
-	if(fitmetric=='RMSE'){fmet <- expression(RMSE);gtitle="RMSE"}
+	if(fitmetric=='rmse'){fmet <- expression(RMSE);gtitle="RMSE"}
+	if(fitmetric=='user'){fmet <- expression(user);gtitle="user"}
 mxy <- max(r2cdf$cdf)
 maxx <- max(r2cdf$fitval)
 plot <- ggplot(r2cdf) + 
@@ -545,7 +650,8 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fi
 						maintitle <- paste("Baseline Noise Level\nfor Various Noise Percentiles(p)")
 						}
 	if(fitmetric=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
-	if(fitmetric=='RMSE'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
+	if(fitmetric=='rmse'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
+	if(fitmetric=="user"){fmet <- paste("user", maintitle);     ylb=expression(user)}
 	gtitle <- fmet
 
 
@@ -591,18 +697,21 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fi
 #' @param pct
 #' @param order a real number
 #' @param ndecimals an integer
-#' @param fitmetric a character string naming a standard fit metric ("R2" and "RMSE")
+#' @param fitmetric a character string naming a standard fit metric ("R2" and "rmse")
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return ggplot object
 #'
 #' @examples
 #' plotEquiv(0.8)
-#' plotEquiv(0.1, fitmetric="RMSE")
+#' plotEquiv(0.1, fitmetric="rmse")
 #'
 #' @export
 #' plotConstValue()
 plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, ndecimals=2, fitmetric='R2', ...){
+	if(fitmetric=='user'){plot="Can't plot -- missing Equiv relationship"
+		} else {
+
 	fitval=measured_value
 
 	pct <- pct[1]										#ensure only one pct is used
@@ -614,7 +723,8 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 
 	for(i in 1:n){dfx$fitEquiv[i] <- fitEquiv(fitval, dof=as.numeric(row.names(dfx)[i]), pct=pct, ndecimals=ndecimals, order=order, fitmetric=fitmetric, ...)}
 	if(fitmetric=="R2"){gtitle = "R-squared"; ylb   <- expression(R^2)}
-	if(fitmetric=="RMSE"){gtitle = "RMSE"; ylb <- expression(RMSE)}
+	if(fitmetric=="rmse"){gtitle = "RMSE"; ylb <- expression(RMSE)}
+	if(fitmetric=="user"){gtitle = "user"; ylb <- expression(User)}
 	maxx		<- max(doflist)	
 	mxy			<- max(dfx[,1],dfx$fitEquiv,fitval)
 	miny		<- min(dfx[,1],dfx$fitEquiv,fitval)
@@ -634,6 +744,7 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 		geom_text(aes(x=maxx, y=(eqy-0.05)),		label=paste0("Equivalent Value"), 				color='blue', hjust=1) +
 		geom_text(aes(x=maxx, y=(fitval+0.05)),	label=paste0("Measured Value = ",fitval), 		color='black',hjust=1)
 	
+	}
 	return(plot)
 	
 }
@@ -669,6 +780,9 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 #' @export
 #' plotConstNoise()
 plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F, fitmetric='R2', ...){
+	if(fitmetric=="user"){plt="Can't plot -- missing Equiv relationship"
+		} else {
+	
 	fitval=measured_value
 	mcolor <- c("red", "blue", "forestgreen", "slategray4", "gray20", "black")
 
@@ -696,7 +810,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 	r2p <- ptable[(dof-1),1]			#column 1 is the r2p values
 	r2k <- fitEquiv(fitval,dof=dof,...)		#find the r2k value for this dof (single number)
 	if(fitmetric=="R2"){	f = fitEquiv(fitval,dof,pct,fitmetric="R2");	ylb=expression(R^2);	  gtitle="R-squared"; ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]}
-	if(fitmetric=="RMSE"){	f = fitEquiv(fitval,dof,pct,fitmetric="RMSE");	ylb=expression(RMSE); gtitle="RMSE";    	  ptable$fitEquiv <- f*(ptable[,1])}
+	if(fitmetric=="rmse"){	f = fitEquiv(fitval,dof,pct,fitmetric="rmse");	ylb=expression(RMSE); gtitle="RMSE";    	  ptable$fitEquiv <- f*(ptable[,1])}
 
 	tx = max(doflist[doflength])
 	ttx = 2/3*tx
@@ -742,7 +856,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=1),fill=mcolor[4],alpha=0.3,na.rm=T)}
 			
 						
-	if(fitmetric=="RMSE"){plt <- plt +
+	if(fitmetric=="rmse"){plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymax=ptable[,2], ymin=0),fill=mcolor[4],alpha=0.3,na.rm=T)}
 			
 			
@@ -759,11 +873,13 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }			
 			
 	#if fitval is in the noise, show the improved but still noisy RMSE values in a black ribbon.
-	if(any(ptable[,2]>ptable[,1]) & fitmetric=="RMSE"){ plt <- plt +
+	if(any(ptable[,2]>ptable[,1]) & fitmetric=="rmse"){ plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,1], ymax=ptable[,2]),fill=mcolor[5],alpha=0.7,na.rm=T) +
 			geom_text(x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }				
 
+
+	}
 	return(plt)
 	#return(ppp)
 }
@@ -798,12 +914,14 @@ fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist='normal',
 	o=order
 	nsamples = 10^order
 	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='R2',  dist=dist, ndecimals=ndecimals,...)
-	RMSEceilings	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='RMSE',dist=dist, ndecimals=ndecimals,...)	
+	RMSEceilings	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='rmse',dist=dist, ndecimals=ndecimals,...)	
+	userbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='user',dist=dist, ndecimals=ndecimals,...)
 	
 	np = length(pctlist)
 	r2b= unlist(R2baselines[1,])
 	rmsec = unlist(RMSEceilings[1,])
-	dfx <- data.frame(dof=rep(dof,np),percentiles=paste0(pctlist*100,"%"),R2=r2b,RMSE=rmsec)
+	userd = unlist(userbaselines[1,])
+	dfx <- data.frame(dof=rep(dof,np),percentiles=paste0(pctlist*100,"%"),R2=r2b,RMSE=rmsec, user=userd)
 	rownames(dfx)=c()
 	name.width <- max(sapply(names(dfx), nchar))
 	format(dfx, width = name.width, justify = "centre")
@@ -825,13 +943,21 @@ fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, 
 	if(fitmetric=="R2"){
 		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
 		}
-	if(fitmetric=="RMSE"){
+	if(fitmetric=="rmse"){
 		dfx$fitval_rev <- rev(dfx$fitval)
 		current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
+		}	
+	#if(fitmetric=="user"){
+	#	dfx$fitval_rev <- rev(dfx$fitval)
+	#	current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
+	#	}
+	if(fitmetric=="user"){
+		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
 		}
 	
 	fmt <- paste0("%1.",ndecimals,"f")
-		
+	
+	
 	if(table){
 	tmv<-"Measured Value:"
 	vmv<-measured_value
@@ -846,6 +972,7 @@ fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, 
 	vdpct <- sprintf(fmt, pct)
 	
 	tapct <- "Calculated Noise Percentile:"
+	#if(fitmetric=='user'){vapct='cant compute'} else {vapct <- sprintf(fmt, current_percentile)}
 	vapct <- sprintf(fmt, current_percentile)
 	
 	tnsamples <- "Number of Samples:"
@@ -855,8 +982,8 @@ fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, 
 	vdist <- dist
 	
 	tfiteq <- "Fit Equivalent Value:"
-	feq    <- fitEquiv(fitval=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
-	vfiteq <- sprintf(fmt, feq) #, "@", sprintf("%1.2f%%", 100 * pct))
+	feq    <- fitEquiv(measured_value=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
+	if(fitmetric=='user'){vfiteq='cant compute'} else {vfiteq <- sprintf(fmt, feq)}
 	
 
 	outdf <- data.frame(Parameter	=c(tfitmetric,tdof,tdist,tnsamples,tmv,tdpct,tapct,tfiteq), 
