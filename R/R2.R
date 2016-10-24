@@ -29,7 +29,7 @@ R2 <- function(x, y){
 		} else {
 			stop("x & y classes or lengths different")
 		}
-	if(ncol(x)==1 | ncol(y)==1){stop("can not compute R2 with only on value")}
+	if(ncol(x)==1 | ncol(y)==1){stop("can not compute R2 with only one value")}
 
 	if(class(x)     == "matrix" & 
 	   class(y)     == "matrix"  &

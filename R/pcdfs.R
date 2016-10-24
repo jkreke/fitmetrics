@@ -37,18 +37,18 @@ rnums1 <- rnum2 <- rep(0,dN)
 
 
            if(	dist=="normal")		{	rnums1 <- rnorm( n=dN, ... );         rnums2 <- rnorm(   n=dN, ... )
-	} else if(	dist=="uniform")		{	rnums1 <- runif( n=dN, ... );         rnums2 <- runif(   n=dN, ... )
+	} else if(	dist=="uniform")	{	rnums1 <- runif( n=dN, ... );         rnums2 <- runif(   n=dN, ... )
 	} else if(	dist=="lognormal")	{	rnums1 <- rlnorm(n=dN, ... );         rnums2 <- rlnorm(  n=dN, ... )
 	} else if(	dist=="chisq")		{	rnums1 <- rchisq(n=dN, df=dof, ... ); rnums2 <- rchisq(  n=dN, df=dof, ... )
 		
-	} else if(	dist=="poisson")		{	rnums1 <- rpois( n=dN, ... );         rnums2 <- rpois(   n=dN, ... )
+	} else if(	dist=="poisson")	{	rnums1 <- rpois( n=dN, ... );         rnums2 <- rpois(   n=dN, ... )
 	} else if(	dist=="binomial")	{	rnums1 <- rbinom(n=dN, ... );         rnums2 <- rbinom(  n=dN, ... )
 	}
 
 
 
 if(fitmetric=="R2")		{fitdf <- gen_R2df(   dof, N, bw, rnums1, rnums2)}
-if(fitmetric=="rmse")	{fitdf <- gen_RMSEdf( dof, N, bw, rnums1, rnums2)}
+if(fitmetric=="rmse")	{fitdf <- gen_rmsedf( dof, N, bw, rnums1, rnums2)}
 if(fitmetric=="user")	{fitdf <- gen_userdf( dof, N, bw, rnums1, rnums2)}
 
 return(fitdf)

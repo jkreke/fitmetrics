@@ -18,10 +18,6 @@
 #' @export
 #'rmse
 rmse <- function(obs, mdl){
-	#need to know if these are vectors of numbers or matrices
-	#need to know that they're the same dimensions
-	#need to know which dimension is dof and which is N
-	#if vectors, convert to matricies
 
 	gclasses=c("numeric", "integer")
 	if(class(obs) %in% gclasses & class(mdl) %in% gclasses & length(obs)==length(mdl)){
