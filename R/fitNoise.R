@@ -23,7 +23,7 @@
 #'
 #' @export
 #' fitNoise()
-fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric='R2', dist='normal', trend=NULL,...){
+fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric=R2, dist='normal', trend=NULL,...){
 
 		if(is.null(trend)){fitmetric_trend = utrend(fitmetric)} else {fitmetric_trend=trend}
 		cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]

@@ -19,11 +19,11 @@
 #' gen_R2df()
 gen_R2df <- function(dof, N, bw, obs, mdl){
 
-
 #establish matricies
 x		<- matrix(mdl, nrow=N, ncol=dof)
 y  		<- matrix(obs, nrow=N, ncol=dof)	#make a matrix of N rows by n columns
 
+#Call R2 function
 R2c <- R2(x,y)
 
 #separate R2s into bins of width bw (histogram R2) to get pdf.  sum pdf to get cdf.

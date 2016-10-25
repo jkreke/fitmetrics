@@ -20,6 +20,7 @@
 R2 <- function(x, y){
 
 	gclasses <- c("numeric", "integer")
+	
 	if(class(x) %in% gclasses & class(y) %in% gclasses & length(x)==length(y)){
 		x <- matrix(x,nrow=1)
 		y <- matrix(y,nrow=1)
@@ -39,7 +40,6 @@ R2 <- function(x, y){
 		N=dim(x)[[1]]
 		dof=dim(x)[[2]]
 		}
-	
 	
 	#define R2 components x and y				
 	xb		<- rowSums(x)/dof
@@ -62,7 +62,6 @@ R2 <- function(x, y){
 
 	#calculate R2 (this is an array of R2 calculations based on noise)
 	R2vector	<- num/den						#R2
-	
 	
 	
 	return(R2vector)

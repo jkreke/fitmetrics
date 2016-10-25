@@ -26,30 +26,44 @@
 #'
 #' @export
 #' pcdfs()
-pcdfs <- function(dof, order=6, ndecimals=2, dist='normal', fitmetric="R2", ... ){
+pcdfs <- function(dof, order=6, ndecimals=2, dist='normal', fitmetric=R2, ... ){
 
 if(order>=7){stop(paste("order is too large (10M) -- calculation time too long. Make order<7. Fractions OK."))}
 N=round(10^order,0)
 bw=1/10^ndecimals #bin width
 
 dN <- dof*N
-rnums1 <- rnum2 <- rep(0,dN)
+mdl <- obs <- rep(0,dN)
 
 
-           if(	dist=="normal")		{	rnums1 <- rnorm( n=dN, ... );         rnums2 <- rnorm(   n=dN, ... )
-	} else if(	dist=="uniform")	{	rnums1 <- runif( n=dN, ... );         rnums2 <- runif(   n=dN, ... )
-	} else if(	dist=="lognormal")	{	rnums1 <- rlnorm(n=dN, ... );         rnums2 <- rlnorm(  n=dN, ... )
-	} else if(	dist=="chisq")		{	rnums1 <- rchisq(n=dN, df=dof, ... ); rnums2 <- rchisq(  n=dN, df=dof, ... )
+           if(	dist=="normal")     {	mdl <- rnorm( n=dN, ... );         obs <- rnorm(   n=dN, ... )
+	} else if(	dist=="uniform")    {	mdl <- runif( n=dN, ... );         obs <- runif(   n=dN, ... )
+	} else if(	dist=="lognormal")  {	mdl <- rlnorm(n=dN, ... );         obs <- rlnorm(  n=dN, ... )
+	} else if(	dist=="chisq")      {	mdl <- rchisq(n=dN, df=dof, ... ); obs <- rchisq(  n=dN, df=dof, ... )
 		
-	} else if(	dist=="poisson")	{	rnums1 <- rpois( n=dN, ... );         rnums2 <- rpois(   n=dN, ... )
-	} else if(	dist=="binomial")	{	rnums1 <- rbinom(n=dN, ... );         rnums2 <- rbinom(  n=dN, ... )
+	} else if(	dist=="poisson")    {	mdl <- rpois( n=dN, ... );         obs <- rpois(   n=dN, ... )
+	} else if(	dist=="binomial")   {	mdl <- rbinom(n=dN, ... );         obs <- rbinom(  n=dN, ... )
 	}
 
 
+#establish matricies -- make matricies of N rows by dof columns
+mdl		<- matrix(mdl, nrow=N, ncol=dof)
+obs  	<- matrix(obs, nrow=N, ncol=dof)	
 
-if(fitmetric=="R2")		{fitdf <- gen_R2df(   dof, N, bw, rnums1, rnums2)}
-if(fitmetric=="rmse")	{fitdf <- gen_rmsedf( dof, N, bw, rnums1, rnums2)}
-if(fitmetric=="user")	{fitdf <- gen_userdf( dof, N, bw, rnums1, rnums2)}
 
-return(fitdf)
+
+#call the fitmetric
+#metc 	<- do.call(fitmetric, list(mdl,obs))
+metc    <- fitmetric(mdl,obs)
+
+#separate metrics into bins of width bw (histogram metic) to get pdf.  sum pdf to get cdf.
+br		<- seq(c(min(metc)), c(max(metc)+bw), by=bw)
+met		<- br[2:length(br)]								#metric values (bins)
+meth	<- hist(metc, breaks=br, plot=F)				#histogrammed
+pdf 	<- meth$counts/sum(meth$counts)					#prob density
+cdf 	<- cumsum(pdf)									#cumulative probability density
+fdf 	<- data.frame(fitval=met, pdf, cdf)
+
+
+return(fdf)
 }

@@ -25,7 +25,7 @@
 #' @export
 #' fit()
 #
-fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, dist='normal', table=TRUE, ... ){
+fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, dist='normal', table=TRUE, ... ){
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
 	
 	fitmetric_trend <- utrend(fitmetric)
@@ -42,7 +42,7 @@ fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, 
 
 	if(table){
 		tfitmetric 	<- "Fit Metric:"
-		vfitmetric 	<- fitmetric
+		vfitmetric 	<- as.character(fitmetric)
 	
 		tdof		<- "Degrees of Freedom:"
 		vdof		<- dof
@@ -56,7 +56,7 @@ fit <- function(measured_value, dof, pct, fitmetric="R2", order=6, ndecimals=2, 
 		tmv			<- "Measured Value:"
 		vmv			<- measured_value
 	
-		tnlevel 	<- if(fitmetric_trend=="Positive"){tnlevel <- paste(fitmetric,"Noise Ceiling:")} else {tnlevel <- paste(fitmetric,"Noise Baseline:")}
+		tnlevel 	<- if(fitmetric_trend=="Positive"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
 		vnlevel 	<- nlevel
 	
 		tdpct 		<- "Min Acceptable Noise Percentile:"

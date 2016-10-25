@@ -25,12 +25,13 @@ utrend <- function(fun){
 	xB = 1000
 	fmt <- "%1.2f"
 
-	if( fun=="R2"   ){func=R2
-		} else if(
-		fun=="rmse" ){func=rmse
-		} else if(
-		fun=="user" ){func=user
-		} else {stop("uncertain fitmetric function")}
+	func=fun
+	#if( fun=="R2"   ){func=R2
+	#	} else if(
+	#	fun=="rmse" ){func=rmse
+	#	} else if(
+	#	fun=="user" ){func=user
+	#	} else {stop("uncertain fitmetric function")}
 		
 	#generate two matricies at two distant points to determine general function trend
 	#use rnorm with default paramters
