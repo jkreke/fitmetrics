@@ -20,16 +20,18 @@
 #'
 #' @export
 #' plotpdf()
-plotpdf <- function(dof, order=4, dist='normal', fitmetric='R2', ...){
+plotpdf <- function(dof, order=4, dist='normal', fitmetric=R2, ...){
+
+fitmetric.character <- deparse(substitute(fitmetric))
 
 dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 N = 10^order
 dist2 <- sapply(dist, cap1)
 mxy = max(dfx$pdf)
 maxx <- max(dfx$fitval)
-	if(fitmetric=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
-	if(fitmetric=='rmse'){fmet <- expression(RMSE);gtitle="RMSE"}
-	if(fitmetric=="user"){fmet <- expression(user);gtitle="user"}
+	if(fitmetric.character=="R2"){fmet   <- expression(R^2);gtitle="R-squared"}
+	if(fitmetric.character=="rmse"){fmet <- expression(RMSE);gtitle="RMSE"}
+	if(fitmetric.character=="user"){fmet <- expression(user);gtitle="user"}
 plot <- ggplot(dfx) + 
 		geom_point(aes(fitval, pdf),size=1) +
 		ylim(0,mxy) +

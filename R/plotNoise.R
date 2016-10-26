@@ -21,7 +21,7 @@
 #'
 #' @export
 #' plotNoise()
-plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fitmetric='R2', ...){
+plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fitmetric=R2, ...){
 	if(length(pctlist)>5){stop(paste("Too many percentiles to calculate", length(pctlist)))}
 
 	doflist <- doflist[doflist>1] 
@@ -48,9 +48,10 @@ plotNoise <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fi
 						} else {
 						maintitle <- paste("Baseline Noise Level\nfor Various Noise Percentiles(p)")
 						}
-	if(fitmetric=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
-	if(fitmetric=='rmse'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
-	if(fitmetric=="user"){fmet <- paste("user", maintitle);     ylb=expression(user)}
+	fitmetric.character <- deparse(substitute(fitmetric))
+	if(fitmetric.character=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
+	if(fitmetric.character=='rmse'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
+	if(fitmetric.character=="user"){fmet <- paste("user", maintitle);     ylb=expression(user)}
 	gtitle <- fmet
 
 

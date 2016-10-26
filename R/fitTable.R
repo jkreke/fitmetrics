@@ -24,9 +24,9 @@
 #' fitStats()
 fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist='normal', order=5, ... ) {
 
-	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='R2',  dist=dist, ndecimals=ndecimals,...)
-	RMSEbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='rmse',dist=dist, ndecimals=ndecimals,...)	
-	userbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric='user',dist=dist, ndecimals=ndecimals,...)
+	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=R2,  dist=dist, ndecimals=ndecimals,...)
+	RMSEbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=rmse,dist=dist, ndecimals=ndecimals,...)	
+	userbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=user,dist=dist, ndecimals=ndecimals,...)
 	
 	np	  <- length(pctlist)
 	r2b   <- unlist(R2baselines[1,])

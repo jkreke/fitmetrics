@@ -22,7 +22,7 @@
 #'
 #' @export
 #' plotConstValue()
-plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, ndecimals=2, fitmetric='R2', ...){
+plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, ndecimals=2, fitmetric=R2, ...){
 
 	fitval=measured_value
 	fitmetric_trend <- utrend(fitmetric)
@@ -34,10 +34,11 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 
 	n <- nrow(dfx)
 
-	for(i in 1:n){dfx$fitEquiv[i] <- fitEquiv(fitval, dof=as.numeric(row.names(dfx)[i]), pct=pct, ndecimals=ndecimals, order=order, fitmetric=fitmetric, trend=fitmetric_trend,...)}
-	if(fitmetric=="R2"){	gtitle = "R-squared"; 	ylb <- expression(R^2)}
-	if(fitmetric=="rmse"){	gtitle = "RMSE"; 		ylb <- expression(RMSE)}
-	if(fitmetric=="user"){	gtitle = "user"; 		ylb <- expression(User)}
+	for(i in 2:n){dfx$fitEquiv[i] <- fitEquiv(fitval, dof=as.numeric(row.names(dfx)[i]), pct=pct, ndecimals=ndecimals, order=order, fitmetric=fitmetric, trend=fitmetric_trend,...)}
+	fitmetric.character <- deparse(substitute(fitmetric))
+	if(fitmetric.character=="R2"){	gtitle = "R-squared"; 	ylb <- expression(R^2)}
+	if(fitmetric.character=="rmse"){gtitle = "RMSE"; 		ylb <- expression(RMSE)}
+	if(fitmetric.character=="user"){gtitle = "user"; 		ylb <- expression(User)}
 	maxx		<- max(doflist)	
 	mxy			<- max(dfx[,1],dfx$fitEquiv,fitval)
 	miny		<- min(dfx[,1],dfx$fitEquiv,fitval)

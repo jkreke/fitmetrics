@@ -42,7 +42,7 @@ fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, di
 
 	if(table){
 		tfitmetric 	<- "Fit Metric:"
-		vfitmetric 	<- as.character(fitmetric)
+		vfitmetric 	<- deparse(substitute(fitmetric))
 	
 		tdof		<- "Degrees of Freedom:"
 		vdof		<- dof

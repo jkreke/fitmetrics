@@ -28,8 +28,9 @@
 #'
 #' @export
 #' plotConstNoise()
-plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F, fitmetric='R2', ...){
+plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F, fitmetric=R2, ...){
 
+	fitmetric.character <- deparse(substitute(fitmetric))
 	fitmetric_trend <- utrend(fitmetric)
 	fitval			<- measured_value
 	mcolor 			<- c("red", "blue", "forestgreen", "slategray4", "gray20", "black")
@@ -57,9 +58,9 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 	ptable <- NoiseTable(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)  #ptable is the list of noiselevel values for this fitmetric at each dof
 	noiselevel <- ptable[(dof-1),1]			#column 1 is the noiselevel values
 
-	if(fitmetric=="R2"){	ylb=expression(R^2);  gtitle="R-squared"}
-	if(fitmetric=="rmse"){	ylb=expression(RMSE); gtitle="RMSE"}
-	if(fitmetric=="user"){  ylb=expression(user); gtitle="user"}
+	if(fitmetric.character=="R2"){	ylb=expression(R^2);  gtitle="R-squared"}
+	if(fitmetric.character=="rmse"){ylb=expression(RMSE); gtitle="RMSE"}
+	if(fitmetric.character=="user"){ylb=expression(user); gtitle="user"}
 
 	f = fitEquiv(fitval,dof,pct,fitmetric=fitmetric, trend=fitmetric_trend, ...)
 	               if(fitmetric_trend=="Negative"){
@@ -73,7 +74,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 
 
 	tx = max(doflist[doflength])
-	ttx = 2/3*tx
+	ttx = 9/16*tx
 	if(length(ptable)==3){ptable <- ptable[c(1,3,2)]}	#ensure proper order of columns;  if pct_r2=T, then swap 2<->3 to keep R2Equiv in pos 2
 
 

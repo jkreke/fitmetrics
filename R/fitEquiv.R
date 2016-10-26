@@ -23,7 +23,7 @@
 #'
 #' @export
 #' fitEquiv()
-fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric="R2", trend=NULL, ...){
+fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric=R2, trend=NULL, ...){
 	fitval=measured_value
 	noiselevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, trend=trend, ...)
 
