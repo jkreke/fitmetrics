@@ -25,7 +25,7 @@
 #' @export
 #' fit()
 #
-fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, dist='normal', table=TRUE, ... ){
+fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, table=TRUE, ... ){
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
 	
 	fitmetric_trend <- utrend(fitmetric)
@@ -36,7 +36,7 @@ fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, di
 		dfx$fitval_rev <- rev(dfx$fitval)
 		current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
 		}	
-	nlevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,trend=fitmetric_trend,...)
+	nlevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=fitmetric_trend,...)
 	fmt <- paste0("%1.",ndecimals,"f")
 	
 
@@ -48,7 +48,7 @@ fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, di
 		vdof		<- dof
 	
 		tdist 		<- "Noise Distribution:"
-		vdist 		<- dist
+		vdist 		<- deparse(substitute(dist))
 	
 		tnsamples 	<- "Number of Samples:"
 		vnsamples 	<- 10^order

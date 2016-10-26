@@ -20,13 +20,13 @@
 #'
 #' @export
 #' plotcdf()
-plotcdf <- function(dof, order=4, dist='normal', fitmetric=R2, ...){  		#need to explicitly state distribiution here in order to get it into the plot title
+plotcdf <- function(dof, order=4, dist=rnorm, fitmetric=R2, ...){  		#need to explicitly state distribiution here in order to get it into the plot title
 
 fitmetric.character <- deparse(substitute(fitmetric))
 r2cdf <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 cdf <- NULL													#see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
 N = 10^order
-dist2 <- sapply(dist, cap1)
+dist2 <- deparse(substitute(dist))
 	if(fitmetric.character=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
 	if(fitmetric.character=='rmse'){fmet <- expression(RMSE);gtitle="RMSE"}
 	if(fitmetric.character=='user'){fmet <- expression(user);gtitle="user"}

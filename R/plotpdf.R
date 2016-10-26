@@ -20,13 +20,13 @@
 #'
 #' @export
 #' plotpdf()
-plotpdf <- function(dof, order=4, dist='normal', fitmetric=R2, ...){
+plotpdf <- function(dof, order=4, dist=rnorm, fitmetric=R2, ...){
 
 fitmetric.character <- deparse(substitute(fitmetric))
 
 dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 N = 10^order
-dist2 <- sapply(dist, cap1)
+dist2 <- deparse(substitute(dist))
 mxy = max(dfx$pdf)
 maxx <- max(dfx$fitval)
 	if(fitmetric.character=="R2"){fmet   <- expression(R^2);gtitle="R-squared"}

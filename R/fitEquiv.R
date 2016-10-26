@@ -11,7 +11,7 @@
 #' @param dof an integer
 #' @param pct a real number between 0 and 1
 #' @param ndecimals an integer
-#' @param fitmetric a character string naming a standard fit metric ("R2", "RMSE", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param trend a character string "Positive", "Negative", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
 #' @param ... any argument that functions within this routine might use
 #'
@@ -19,7 +19,7 @@
 #'
 #' @examples
 #' fitEquiv(0.8, 6)
-#' fitEquiv(0.1, dof=8, fitmetric="RMSE")
+#' fitEquiv(0.1, dof=8, fitmetric=rmse)
 #'
 #' @export
 #' fitEquiv()

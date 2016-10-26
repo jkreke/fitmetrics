@@ -15,43 +15,42 @@
 #' @param order a real number
 #' @param ndecimals an integer
 #' @param dist a random number distribution function
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user-defined)
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return a data frame
 #'
 #' @examples
 #' pcdf(5, order=5)
-#' pcdf(10, order=4, fitmetric="rmse")
+#' pcdf(10, order=4, fitmetric=rmse)
 #'
 #' @export
 #' pcdfs()
-pcdfs <- function(dof, order=6, ndecimals=2, dist='normal', fitmetric=R2, ... ){
+pcdfs <- function(dof, order=6, ndecimals=2, dist=rnorm, fitmetric=R2, ... ){
 
 if(order>=7){stop(paste("order is too large (10M) -- calculation time too long. Make order<7. Fractions OK."))}
 N=round(10^order,0)
 bw=1/10^ndecimals #bin width
 
+#initialize variables
 dN <- dof*N
 mdl <- obs <- rep(0,dN)
 
-
-           if(	dist=="normal")     {	mdl <- rnorm( n=dN, ... );         obs <- rnorm(   n=dN, ... )
-	} else if(	dist=="uniform")    {	mdl <- runif( n=dN, ... );         obs <- runif(   n=dN, ... )
-	} else if(	dist=="lognormal")  {	mdl <- rlnorm(n=dN, ... );         obs <- rlnorm(  n=dN, ... )
-	} else if(	dist=="chisq")      {	mdl <- rchisq(n=dN, df=dof, ... ); obs <- rchisq(  n=dN, df=dof, ... )
-		
-	} else if(	dist=="poisson")    {	mdl <- rpois( n=dN, ... );         obs <- rpois(   n=dN, ... )
-	} else if(	dist=="binomial")   {	mdl <- rbinom(n=dN, ... );         obs <- rbinom(  n=dN, ... )
-	}
-
+#form random number lists to simulate model and observation measurements (or x,y)
+mdl <- dist(dN,...)
+obs <- dist(dN,...)
 
 #establish matricies -- make matricies of N rows by dof columns
 mdl		<- matrix(mdl, nrow=N, ncol=dof)
 obs  	<- matrix(obs, nrow=N, ncol=dof)	
 
-#call the fitmetric
+#call the fitmetric (ie, R2 or rmse or user-defined)
 metc    <- fitmetric(mdl,obs)
+
+#remove any measurement that yields NaN
+mdl <- mdl[!is.nan(metc),]
+obs <- obs[!is.nan(metc),]
+metc<- metc[!is.nan(metc)]
 
 #separate metrics into bins of width bw (histogram metic) to get pdf.  sum pdf to get cdf.
 br		<- seq(c(min(metc)), c(max(metc)+bw), by=bw)

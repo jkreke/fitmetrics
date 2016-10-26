@@ -22,7 +22,7 @@
 #'
 #' @export
 #' fitStats()
-fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist='normal', order=5, ... ) {
+fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist=rnorm, order=5, ... ) {
 
 	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=R2,  dist=dist, ndecimals=ndecimals,...)
 	RMSEbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=rmse,dist=dist, ndecimals=ndecimals,...)	
@@ -37,7 +37,7 @@ fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist='normal',
 	name.width <- max(sapply(names(dfx), nchar))
 	format(dfx, width = name.width, justify = "centre")
 	
-	print(paste("Noise Dist:         ",dist))
+	print(paste("Noise Dist:         ",deparse(substitute(dist))))
 	print(paste("Number of Samples:  ", 10^order))
 	print(paste("Degrees of Freedom: ",dof))
 
