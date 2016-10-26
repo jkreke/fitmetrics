@@ -50,10 +50,7 @@ mdl <- obs <- rep(0,dN)
 mdl		<- matrix(mdl, nrow=N, ncol=dof)
 obs  	<- matrix(obs, nrow=N, ncol=dof)	
 
-
-
 #call the fitmetric
-#metc 	<- do.call(fitmetric, list(mdl,obs))
 metc    <- fitmetric(mdl,obs)
 
 #separate metrics into bins of width bw (histogram metic) to get pdf.  sum pdf to get cdf.
