@@ -1,7 +1,7 @@
 ##############################################################################################################################
 #
 #	For a given value of R2, dof and pct, determine the noise-normalized, dof-independent, 
-#      distribution-independent, R2 equivalent:  R2k
+#      distribution-independent, R2 equivalent
 #
 #' Fit Equivalent
 #' 

@@ -17,14 +17,14 @@
 #' @param pct a real number between 0 and 1, minimum acceptable level of noise
 #' @param order a real number
 #' @param plot_pctr2 a logical value indicating whether to include or not the fitEquive placed at each dof.
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return ggplot object
 #'
 #' @examples
 #' plotConstNoise(0.8, 5)
-#' plotConstNoise(0.1, 5, fitmetric="rmse")
+#' plotConstNoise(0.1, 5, fitmetric=rmse)
 #'
 #' @export
 #' plotConstNoise()

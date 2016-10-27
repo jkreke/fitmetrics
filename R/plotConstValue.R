@@ -11,14 +11,14 @@
 #' @param pct a real number between 0 and 1, acceptable minimum level of noise
 #' @param order a real number
 #' @param ndecimals an integer
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return ggplot object
 #'
 #' @examples
 #' plotEquiv(0.8)
-#' plotEquiv(0.1, fitmetric="rmse")
+#' plotEquiv(0.1, fitmetric=rmse)
 #'
 #' @export
 #' plotConstValue()

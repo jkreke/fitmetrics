@@ -10,13 +10,13 @@
 #' @param dof an integer
 #' @param order a real number
 #' @param dist a random number distribution function
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return ggplot object
 #'
 #' @examples
-#' plotcdf(5, dist='uniform', fitmetric='rmse')
+#' plotcdf(5, dist=uniform, fitmetric=rmse)
 #'
 #' @export
 #' plotcdf()

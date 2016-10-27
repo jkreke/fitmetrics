@@ -20,32 +20,24 @@
 utrend <- function(fun){
 
 	#initiate varaiables
-	nsamples=3*10^5
-	xA = 3
-	xB = 1000
+	nsamples <- 3*10^5
+	xA  <- 3
+	xB  <- 1000
 	fmt <- "%1.2f"
 
-	func=fun
-	#if( fun=="R2"   ){func=R2
-	#	} else if(
-	#	fun=="rmse" ){func=rmse
-	#	} else if(
-	#	fun=="user" ){func=user
-	#	} else {stop("uncertain fitmetric function")}
-		
 	#generate two matricies at two distant points to determine general function trend
 	#use rnorm with default paramters
 	#pointA
 	matA <- matrix(rnorm(nsamples), ncol=xA)
 	matB <- matrix(rnorm(nsamples), ncol=xA)
-	vA <- func(matA, matB)
+	vA <- fun(matA, matB)
 	vA <- sum(vA)/length(vA)
 	vA <- sprintf(fmt,vA)
 	
 	#pointB
 	matA <- matrix(rnorm(nsamples), ncol=xB)
 	matB <- matrix(rnorm(nsamples), ncol=xB)
-	vB <- func(matA, matB)
+	vB <- fun(matA, matB)
 	vB <- sum(vB)/length(vB)
 	vB <- sprintf(fmt, vB)
 

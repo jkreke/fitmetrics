@@ -10,7 +10,7 @@
 #' @param dof an integer
 #' @param pct a real number between 0 and 1
 #' @param ndecimals an integer
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param dist a random number distribution function
 #' @param trend a character string "Positive", "Negative", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
 #' @param ... any argument that functions within this routine might use

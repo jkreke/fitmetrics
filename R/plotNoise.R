@@ -11,7 +11,7 @@
 #' @param pctlist a vector of percentiles (expressed as fractions)
 #' @param order a real number greater than 0 and less than 7
 #' @param ndecimals an integer
-#' @param fitmetric a character string naming a standard fit metric ("R2", "rmse", or "user")
+#' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return ggplot object
