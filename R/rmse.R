@@ -19,26 +19,11 @@
 #'rmse
 rmse <- function(obs, mdl){
 
-	gclasses=c("numeric", "integer")
-	if(class(obs) %in% gclasses & class(mdl) %in% gclasses & length(obs)==length(mdl)){
-		obs <- matrix(obs,nrow=1)
-		mdl <- matrix(mdl,nrow=1)
-		} else if(class(obs)=="matrix" & class(mdl)=="matrix"){
-			
-			
-		} else {
-			stop("obs and mdl classes or lengths different")
-		}
-
-
-	if(class(obs)     == "matrix" & 
-	   class(mdl)     == "matrix"  &
-	   dim(obs)[[1]]  == dim(mdl)[[1]]  & 
-	   dim(obs)[[2]]  == dim(mdl)[[2]]
-	   ){		
-		N=dim(obs)[[1]]
-		dof=dim(obs)[[2]]
-		}
+	mlist <- Consistency_Check(x,y)
+	x <- mlist[[1]]
+	y <- mlist[[2]]
+	N <- mlist[[3]]
+	dof <- mlist[[4]]
 
 	#get delta
 	ed 		<- obs-mdl								#predicted ep									
@@ -52,8 +37,8 @@ rmse <- function(obs, mdl){
 	den		<- sqrt(dof)						#denominator
 
 	#calculate rmse (this is an array of rmse calculations based on noise)
-	rmsevector	<- num/den
+	out	<- num/den
 
-	return(rmsevector)
+	return(out)
 
 }
