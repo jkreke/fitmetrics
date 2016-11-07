@@ -26,7 +26,10 @@ fitmetric.character <- deparse(substitute(fitmetric))
 r2cdf <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 cdf <- NULL													#see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
 N = 10^order
-dist2 <- deparse(substitute(dist))
+dist.character <- deparse(substitute(dist))
+fitmetric.character <- deparse(substitute(fitmetric))
+	fmet<- fitmetric.character
+	gtitle<- fitmetric.character
 	if(fitmetric.character=='R2'){fmet   <- expression(R^2);gtitle="R-squared"}
 	if(fitmetric.character=='rmse'){fmet <- expression(RMSE);gtitle="RMSE"}
 	if(fitmetric.character=='user'){fmet <- expression(user);gtitle="user"}
@@ -38,7 +41,7 @@ plot <- ggplot(r2cdf) +
 		xlab(fmet) + 
 		ylab("Cumulative Probability") +
 		ggtitle(paste(gtitle,"Cumulative Probability Density Function")) +
-		geom_text(aes(x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",dist2,
+		geom_text(aes(x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",dist.character,
 													"\nDegrees of Freedom:",dof,
 													"\nNumber of  Samples:",floor(N))),size=3,hjust=1)
 

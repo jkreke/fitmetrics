@@ -26,9 +26,11 @@ fitmetric.character <- deparse(substitute(fitmetric))
 
 dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 N = 10^order
-dist2 <- deparse(substitute(dist))
+dist.character <- deparse(substitute(dist))
 mxy = max(dfx$pdf)
 maxx <- max(dfx$fitval)
+	gtitle<-fitmetric.character
+	fmet <- fitmetric.character
 	if(fitmetric.character=="R2"){fmet   <- expression(R^2);gtitle="R-squared"}
 	if(fitmetric.character=="rmse"){fmet <- expression(RMSE);gtitle="RMSE"}
 	if(fitmetric.character=="user"){fmet <- expression(user);gtitle="user"}
@@ -38,7 +40,7 @@ plot <- ggplot(dfx) +
 		xlab(fmet) + 
 		ylab("Probability Density") +
 		ggtitle(paste(gtitle, "Probability Density Function")) +
-		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",dist2,
+		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",dist.character,
 													"\nDegrees of Freedom:",dof,
 													"\nNumber of  Samples:",floor(N))),size=3,hjust=1)
 
