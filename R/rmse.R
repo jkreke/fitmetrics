@@ -19,9 +19,9 @@
 #'rmse
 rmse <- function(obs, mdl){
 
-	mlist <- Consistency_Check(x,y)
-	x <- mlist[[1]]
-	y <- mlist[[2]]
+	mlist <- Consistency_Check(obs,mdl)
+	obs <- mlist[[1]]
+	mdl <- mlist[[2]]
 	N <- mlist[[3]]
 	dof <- mlist[[4]]
 
