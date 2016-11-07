@@ -19,14 +19,14 @@
 #'rmse
 rmse <- function(obs, mdl){
 
-	mlist <- Consistency_Check(obs,mdl)
+	mlist <- fitmetric_check(obs,mdl)
 	obs <- mlist[[1]]
 	mdl <- mlist[[2]]
 	N <- mlist[[3]]
 	dof <- mlist[[4]]
 
 	#get delta
-	ed 		<- obs-mdl								#predicted ep									
+	ed 		<- obs-mdl							#predicted ep									
 
 	#calculate RMSE numerator
 	n1		<- ed*ed							#square the individual elements (not matrix multiplication)

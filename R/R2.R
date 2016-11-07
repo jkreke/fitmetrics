@@ -19,7 +19,7 @@
 #'R2
 R2 <- function(x, y){
 
-	mlist <- Consistency_Check(x,y)
+	mlist <- fitmetric_check(x,y)
 	x <- mlist[[1]]
 	y <- mlist[[2]]
 	N <- mlist[[3]]
