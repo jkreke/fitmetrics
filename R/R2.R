@@ -19,34 +19,18 @@
 #'R2
 R2 <- function(x, y){
 
-	gclasses <- c("numeric", "integer")
-	
-	if(class(x) %in% gclasses & class(y) %in% gclasses & length(x)==length(y)){
-		x <- matrix(x,nrow=1)
-		y <- matrix(y,nrow=1)
-		} else if(class(x)=="matrix" & class(y)=="matrix"){
-			
-			
-		} else {
-			stop("x & y classes or lengths different")
-		}
-	if(ncol(x)==1 | ncol(y)==1){stop("can not compute R2 with only one value")}
-
-	if(class(x)     == "matrix" & 
-	   class(y)     == "matrix"  &
-	   dim(x)[[1]]  == dim(y)[[1]]  & 
-	   dim(x)[[2]]  == dim(y)[[2]]
-	   ){		
-		N=dim(x)[[1]]
-		dof=dim(x)[[2]]
-		}
+	mlist <- Consistency_Check(x,y)
+	x <- mlist[[1]]
+	y <- mlist[[2]]
+	N <- mlist[[3]]
+	dof <- mlist[[4]]
 	
 	#define R2 components x and y				
-	xb		<- rowSums(x)/dof
-	xd		<- x-xb
+	xb		<- rowSums(x)/dof					#xbar (mean of x)
+	xd		<- x-xb								#xdelta (x-xbar)
 
-	yb 		<- rowSums(y)/dof					#get means for each row
-	yd 		<- y-yb								#get delta
+	yb 		<- rowSums(y)/dof					#ybar (mean of y)
+	yd 		<- y-yb								#ydelta (y-ybar)
 
 	#calculate R2 numerator
 	n1		<- xd*yd
@@ -61,10 +45,10 @@ R2 <- function(x, y){
 	den		<- d1s*d2s							#denominator
 
 	#calculate R2 (this is an array of R2 calculations based on noise)
-	R2vector	<- num/den						#R2
+	out	<- num/den								#R2
 	
 	
-	return(R2vector)
+	return(out)
 	
 	
 }
