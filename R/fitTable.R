@@ -22,17 +22,23 @@
 #'
 #' @export
 #' fitStats()
-fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist=rnorm, order=5, ... ) {
+fitTable <- function(dof, pctlist=c(0.90,0.95,0.99), ndecimals=2, dist=rnorm, order=5, fitmetriclist=c(R2,rmse),... ) {
 
-	R2baselines		<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=R2,  dist=dist, ndecimals=ndecimals,...)
-	RMSEbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=rmse,dist=dist, ndecimals=ndecimals,...)	
-	userbaselines	<- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=user,dist=dist, ndecimals=ndecimals,...)
-	
 	np	  <- length(pctlist)
-	r2b   <- unlist(R2baselines[1,])
-	rmsec <- unlist(RMSEbaselines[1,])
-	userd <- unlist(userbaselines[1,])
-	dfx   <- data.frame(dof=rep(dof,np),percentiles=paste0(pctlist*100,"%"),R2=r2b,RMSE=rmsec, user=userd)
+	dfx   <- data.frame(dof=rep(dof,np), percentiles=paste0(pctlist*100,"%") )
+	fitmetric.character <- as.character(substitute(fitmetriclist))
+	fitmetric.character <- fitmetric.character[2:length(fitmetric.character)]
+	i=0
+	for(fit.func in fitmetriclist){
+		i=i+1
+		fitfuncname <- fitmetric.character[i]
+		fitm_lines <- NoiseTable(doflist=dof,pctlist=pctlist, order=order, fitmetric=fit.func,  dist=dist, ndecimals=ndecimals,...)
+		fitm_lines2   <- unlist(fitm_lines[1,])
+		nams <- names(dfx)
+		dfx <- cbind(dfx,fitm_lines2)
+		names(dfx) <- c(nams,fitfuncname)
+	}
+
 	rownames(dfx) <- c()
 	name.width <- max(sapply(names(dfx), nchar))
 	format(dfx, width = name.width, justify = "centre")
