@@ -42,7 +42,7 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 	maxx		<- max(doflist)	
 	mxy			<- max(dfx[,1],dfx$fitEquiv,fitval)
 	miny		<- min(dfx[,1],dfx$fitEquiv,fitval)
-	if(fitmetric_trend=="Negative"){miny=0}
+	if(fitmetric_trend=="Decreasing"){miny=0}
 	else{miny		<- max(miny,-10)}
 	eqy <- dfx$fitEquiv[row.names(dfx)==maxx]
 	pcy	<- dfx[row.names(dfx)==maxx,1]

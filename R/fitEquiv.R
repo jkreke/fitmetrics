@@ -12,7 +12,7 @@
 #' @param pct a real number between 0 and 1
 #' @param ndecimals an integer
 #' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
-#' @param trend a character string "Positive", "Negative", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
+#' @param trend a character string "Increasing", "Decreasing", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return a real number
@@ -29,12 +29,12 @@ fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric=R2, t
 
 	#determine if noise trends upward (positive) or downward (negative)
 	if(is.null(trend)){fitmetric_trend = utrend(fitmetric)} else {fitmetric_trend=trend}
-	if(fitmetric_trend=="Negative"){
+	if(fitmetric_trend=="Decreasing"){
 			eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)
-		} else if(fitmetric_trend=="Positive"){
+		} else if(fitmetric_trend=="Increasing"){
 			eqfitval <- fitval/noiselevel
 		} else 
-			stop("uncertain fitmetric trend")
+			stop("uncertain or flat fitmetric trend")
 	
 	
 	#make eqfitval consistent with the number of decimal places in noiselevel.  may have to tweak this for positive trend functions

@@ -21,7 +21,7 @@
 #' @param order a real number
 #' @param ndecimals an integer
 #' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
-#' @param trend a character string "Positive", "Negative", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
+#' @param trend a character string "Increasing", "Decreasing", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return a data frame

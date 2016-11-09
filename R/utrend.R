@@ -45,9 +45,9 @@ utrend <- function(fun){
 	mdl <- lm(v~x,data=df)
 	slope <- mdl$coefficient[[2]]
 	
-		   if(slope> 0)	{trend <- "Positive"
+		   if(slope> 0)	{trend <- "Increasing"
 	} else if(slope==0)	{trend <- "Flat"
-	} else if(slope< 0)	{trend <- "Negative"
+	} else if(slope< 0)	{trend <- "Decreasing"
 	} else 				{trend <- "Uncertain"
 		}
 

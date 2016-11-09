@@ -12,7 +12,7 @@
 #' @param ndecimals an integer
 #' @param fitmetric a character string naming a standard fit metric (R2, rmse, or user)
 #' @param dist a random number distribution function
-#' @param trend a character string "Positive", "Negative", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
+#' @param trend a character string "Increasing", "Decreasing", "Flat", "Uncertain" which describes the general slope of the fitmetric function.
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return a real number
@@ -27,16 +27,16 @@ fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric=R2, dist=rnorm, trend
 
 		if(is.null(trend)){fitmetric_trend = utrend(fitmetric)} else {fitmetric_trend=trend}
 		cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]
-		if(fitmetric_trend=="Positive"){
+		if(fitmetric_trend=="Increasing"){
 			c_pct <- as.numeric(1-as.numeric(pct))
 			c_val <- cdf$fitval[cdf$cdf<=c_pct]
 			c_val <- rev(c_val)
 			nb <- c_val[1]
 
-		} else if(fitmetric_trend=="Negative") {
+		} else if(fitmetric_trend=="Decreasing") {
 			nb <- cdf$fitval[cdf$cdf>=pct][1]		#nb is the value of cdf just at the point where it's just >= p
 		} else {
-			stop("uncertain fitmetric trend")
+			stop("uncertain or flat fitmetric trend")
 		}
 		nb <- nb + rnorm(1)*10^(-(ndecimals+2))  #add a small random number to remove any binning errors.
 		fmt <- paste0("%1.",ndecimals,"f")

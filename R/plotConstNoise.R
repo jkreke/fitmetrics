@@ -63,12 +63,12 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 	if(fitmetric.character=="user"){ylb=expression(user); gtitle="user"}
 
 	f = fitEquiv(fitval,dof,pct,fitmetric=fitmetric, trend=fitmetric_trend, ...)
-	               if(fitmetric_trend=="Negative"){
+	               if(fitmetric_trend=="Decreasing"){
 				          ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]
-			} else if(fitmetric_trend=="Positive") {
+			} else if(fitmetric_trend=="Increasing") {
 				          ptable$fitEquiv <- f*(ptable[,1])
 			} else {
-				          stop("fitmetric trend uncertain")
+				          stop("fitmetric trend flat or uncertain")
 			}		
 	ptable$fitEquiv[(dof-1)]=measured_value   #fitEquiv at dof must equal the measured_value at dof.  ptable will be a little off,due to randomness so make them equal.
 
@@ -113,9 +113,9 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 			
 			
 
-	if(fitmetric_trend=="Negative"){plt <- plt +
+	if(fitmetric_trend=="Decreasing"){plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=1),fill=mcolor[4],alpha=0.3,na.rm=T)}		#ymax here might be dependent on the metric				
-	if(fitmetric_trend=="Positive"){plt <- plt +
+	if(fitmetric_trend=="Increasing"){plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymax=ptable[,2], ymin=0),fill=mcolor[4],alpha=0.3,na.rm=T)}
 			
 
@@ -125,13 +125,13 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 			geom_text(x=ttx, y=tval[7], label=paste0(fitmetric," Noise Percentile = ",pctlist[2]), color=mcolor[2], hjust=0,size=4,na.rm=T)}
 
 	#if fitval is in the noise, show the improved but still noisy R2 values in a black ribbon.
-	if(fitval<ptable[dof,1] & fitmetric_trend=="Negative"){ plt <- plt +
+	if(fitval<ptable[dof,1] & fitmetric_trend=="Decreasing"){ plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=ptable[,1]),fill=mcolor[5],alpha=0.7,na.rm=T) +
 			geom_text(x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }			
 			
 	#if fitval is in the noise, show the improved but still noisy RMSE values in a black ribbon.
-	if(fitval>ptable[dof,1] & fitmetric_trend=="Positive"){ plt <- plt +
+	if(fitval>ptable[dof,1] & fitmetric_trend=="Increasing"){ plt <- plt +
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,1], ymax=ptable[,2]),fill=mcolor[5],alpha=0.7,na.rm=T) +
 			geom_text(x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
 			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=4,shape=8, color=mcolor[3],na.rm=T) }				

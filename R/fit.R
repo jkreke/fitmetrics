@@ -29,10 +29,10 @@ fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, di
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
 	
 	fitmetric_trend <- utrend(fitmetric)
-	if(fitmetric_trend=="Negative"){
+	if(fitmetric_trend=="Decreasing"){
 		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
 		}
-	if(fitmetric_trend=="Positive"){
+	if(fitmetric_trend=="Increasing"){
 		dfx$fitval_rev <- rev(dfx$fitval)
 		current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
 		}	
@@ -56,7 +56,7 @@ fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, di
 		tmv			<- "Measured Value:"
 		vmv			<- measured_value
 	
-		tnlevel 	<- if(fitmetric_trend=="Positive"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
+		tnlevel 	<- if(fitmetric_trend=="Increasing"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
 		vnlevel 	<- nlevel
 	
 		tdpct 		<- "Min Acceptable Noise Percentile:"
