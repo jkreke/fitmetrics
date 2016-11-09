@@ -28,7 +28,7 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 	fitmetric_trend <- utrend(fitmetric)
 
 	pct <- pct[1]										#ensure only one pct is used
-	dfx <- NoiseTable(doflist=doflist, pctlist=pct, order=order, ndecimals=ndecimals, fitmetric=fitmetric, trend=fitmetric_trend,...)
+	dfx <- Table_dofbypct(doflist=doflist, pctlist=pct, order=order, ndecimals=ndecimals, fitmetric=fitmetric, trend=fitmetric_trend,...)
 
 	dfx$fitEquiv <- NA
 

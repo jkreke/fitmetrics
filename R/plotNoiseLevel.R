@@ -39,7 +39,7 @@ plotNoiseLevel <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=
 	#sizes <- c(1, 0.8, 0.6, 0.4, 0.2)   #use these for geom_path instead of geom_point
 	
 	fitmetric_trend = utrend(fitmetric)
-	noisedf <- NoiseTable(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)
+	noisedf <- Table_dofbypct(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)
 	mxy <- 0.9*max(noisedf[,1])
 	N = 10^order
 	plt <- ggplot(noisedf)

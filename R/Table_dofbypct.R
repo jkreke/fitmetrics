@@ -27,12 +27,12 @@
 #' @return a data frame
 #'
 #' @examples
-#' NoiseTable(fitmetric=rmse)
+#' Table_dofbypct(fitmetric=rmse)
 #'
 #' @export
-#' NoiseTable()
+#' Table_dofbypct()
 #
-NoiseTable <- function(doflist=NULL, pctlist=NULL, order=4, ndecimals=2, fitmetric=R2, trend=NULL, ...){
+Table_dofbypct <- function(doflist=NULL, pctlist=NULL, order=4, ndecimals=2, fitmetric=R2, trend=NULL, ...){
 	if(is.null(doflist)){doflist=c(4,8,16,32,64,128)}
 	if(is.null(pctlist)){pctlist=c(0.7,0.9,0.95,0.99)}
 	if(is.null(trend)){fitmetric_trend=utrend(fitmetric)} else {fitmetric_trend=trend}

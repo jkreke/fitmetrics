@@ -55,7 +55,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 	doflength = length(doflist)
 	pctlength = length(pctlist)
 
-	ptable <- NoiseTable(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)  #ptable is the list of noiselevel values for this fitmetric at each dof
+	ptable <- Table_dofbypct(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)  #ptable is the list of noiselevel values for this fitmetric at each dof
 	noiselevel <- ptable[(dof-1),1]			#column 1 is the noiselevel values
 
 	if(fitmetric.character=="R2"){	ylb=expression(R^2);  gtitle="R-squared"}
