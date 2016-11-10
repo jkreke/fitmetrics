@@ -20,12 +20,12 @@
 #' @return data frame
 #'
 #' @examples
-#' fit(6, dof=10, pct=0.95)
+#' fit(6, dof=10, pct=0.99)
 #'
 #' @export
 #' fit()
 #
-fit <- function(measured_value, dof, pct, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, table=TRUE, ... ){
+fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, table=TRUE, ... ){
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
 	
 	fitmetric_trend <- utrend(fitmetric)
