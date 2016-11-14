@@ -25,23 +25,22 @@ plotpdf <- function(dof, order=4, dist=rnorm, fitmetric=R2, ...){
 
 dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 
-pdf <- NULL				#see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
-N = 10^order
-dist.character <- deparse(substitute(dist))
-fitmetric.character <- deparse(substitute(fitmetric))
-fmet <- fitmetric.character
-gtitle<-fitmetric.character	
-mxy = max(dfx$pdf)
+#see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
+pdf <- NULL
+Nsam <- floor(10^order)
+cdst <- deparse(substitute(dist))
+cfit <- deparse(substitute(fitmetric))
+mxy  <- max(dfx$pdf)
 maxx <- max(dfx$fitval)
 plot <- ggplot(dfx) + 
 		geom_point(aes(fitval, pdf),size=1) +
 		ylim(0,mxy) +
-		xlab(fmet) + 
+		xlab(cfit) + 
 		ylab("Probability Density") +
-		ggtitle(paste(gtitle, "Probability Density Function")) +
-		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",dist.character,
+		ggtitle(paste(cfit, "Probability Density Function")) +
+		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",cdst,
 													"\nDegrees of Freedom:",dof,
-													"\nNumber of  Samples:",floor(N))),size=3,hjust=1)
+													"\nNumber of  Samples:",Nsam)),size=3,hjust=1)
 
 
 return(plot)

@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .DS_Store
+.gitignore
+Rapp.history
+myfunc.R
+user.R
+
