@@ -38,7 +38,7 @@ plot <- ggplot(dfx) +
 		xlab(cfit) + 
 		ylab("Cumulative Probability") +
 		ggtitle(paste(cfit,"Cumulative Probability Density Function"))
-													"\nNumber of  Samples:",floor(Nsam))),size=3,hjust=1)
+
 plot <- plot +
 		annotate("text",x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",cdst,
 													"\nDegrees of Freedom:",dof,
