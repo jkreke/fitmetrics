@@ -37,11 +37,13 @@ plot <- ggplot(dfx) +
 		ylim(0,mxy) +
 		xlab(cfit) + 
 		ylab("Probability Density") +
-		ggtitle(paste(cfit, "Probability Density Function")) +
-		geom_text(aes(x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",cdst,
-													"\nDegrees of Freedom:",dof,
-													"\nNumber of  Samples:",Nsam)),size=3,hjust=1)
+		ggtitle(paste(cfit, "Probability Density Function"))
 
+plot <- plot +
+		annotate("text",x=0.95*maxx,y=0.9*mxy,label=paste("Noise Distribution:",cdst,
+													"\nDegrees of Freedom:",dof,
+													"\nNumber of  Samples:",Nsam),
+													size=3,hjust=1,fontface=2)
 
 return(plot)
 }

@@ -35,12 +35,19 @@ maxx <- max(dfx$fitval)
 plot <- ggplot(dfx) + 
 		geom_point(aes(fitval, cdf),size=1) +
 		ylim(0,mxy) + 
-		xlab(fmet) + 
+		xlab(cfit) + 
 		ylab("Cumulative Probability") +
-		ggtitle(paste(cfit,"Cumulative Probability Density Function")) +
-		geom_text(aes(x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",cdst,
+		ggtitle(paste(cfit,"Cumulative Probability Density Function"))
+#		geom_text(aes(x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",cdst,
+#													"\nDegrees of Freedom:",dof,
+#													"\nNumber of  Samples:",floor(Nsam))),size=3,hjust=1)
+
+plot <- plot +
+		annotate("text",x=0.95*maxx,y=0.3*mxy,label=paste("Noise Distribution:",cdst,
 													"\nDegrees of Freedom:",dof,
-													"\nNumber of  Samples:",floor(Nsam))),size=3,hjust=1)
+													"\nNumber of  Samples:",Nsam),
+													size=3,hjust=1,fontface=2)
+
 
 return(plot)
 }
