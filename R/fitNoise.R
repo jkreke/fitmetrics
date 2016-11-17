@@ -28,15 +28,14 @@ fitNoise <- function(dof, pct=0.95, ndecimals=2, fitmetric=R2, dist=rnorm, trend
 		if(is.null(trend)){fitmetric_trend = utrend(fitmetric)} else {fitmetric_trend=trend}
 		cdf <- pcdfs(dof, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, ...)[,c("fitval","cdf")]
 		if(fitmetric_trend=="Increasing"){
-			c_pct <- as.numeric(1-as.numeric(pct))
-			c_val <- cdf$fitval[cdf$cdf<=c_pct]
-			c_val <- rev(c_val)
-			nb <- c_val[1]
+			nb <- cdf$fitval[cdf$cdf>=(1-as.numeric(pct))][1]
 
 		} else if(fitmetric_trend=="Decreasing") {
 			nb <- cdf$fitval[cdf$cdf>=pct][1]		#nb is the value of cdf just at the point where it's just >= p
+			
 		} else {
 			stop("uncertain or flat fitmetric trend")
+			
 		}
 		nb <- nb + rnorm(1)*10^(-(ndecimals+2))  #add a small random number to remove any binning errors.
 		fmt <- paste0("%1.",ndecimals,"f")

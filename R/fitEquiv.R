@@ -32,7 +32,7 @@ fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric=R2, t
 	if(fitmetric_trend=="Decreasing"){
 			eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)
 		} else if(fitmetric_trend=="Increasing"){
-			eqfitval <- fitval/noiselevel
+			eqfitval <- (fitval)/(noiselevel + 0.00000000001) #don't use (nl-fv)/(nl).  Opposite trend wrt fv.
 		} else 
 			stop("uncertain or flat fitmetric trend")
 	

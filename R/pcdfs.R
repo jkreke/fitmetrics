@@ -34,7 +34,7 @@ bw=1/10^ndecimals #bin width
 
 #initialize variables
 dN <- dof*N
-mdl <- obs <- rep(0,dN)
+mdl <- obs <- rep(NA,dN)
 
 #form random number lists to simulate model and observation measurements (or x,y)
 mdl <- dist(dN,...)
@@ -48,8 +48,6 @@ obs  	<- matrix(obs, nrow=N, ncol=dof)
 metc    <- fitmetric(mdl,obs)
 
 #remove any measurement that yields NaN
-mdl <- mdl[!is.nan(metc),]
-obs <- obs[!is.nan(metc),]
 metc<- metc[!is.nan(metc)]
 
 #separate metrics into bins of width bw (histogram metic) to get pdf.  sum pdf to get cdf.

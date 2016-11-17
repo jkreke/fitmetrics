@@ -32,10 +32,11 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 	if(fitmetric_trend=="Decreasing"){
 		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
 		}
+		
 	if(fitmetric_trend=="Increasing"){
-		dfx$fitval_rev <- rev(dfx$fitval)
-		current_percentile <- dfx$cdf[dfx$fitval_rev<measured_value][1]
-		}	
+		current_percentile <- 1-dfx$cdf[dfx$fitval>=measured_value][1]
+		}
+			
 	nlevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=fitmetric_trend,...)
 	fmt <- paste0("%1.",ndecimals,"f")
 	
