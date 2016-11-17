@@ -25,7 +25,7 @@
 #' @export
 #' fit()
 #
-fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, table=TRUE, ... ){
+fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, fitout="table", ... ){
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
 	
 	fitmetric_trend <- utrend(fitmetric)
@@ -36,12 +36,22 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 	if(fitmetric_trend=="Increasing"){
 		current_percentile <- 1-dfx$cdf[dfx$fitval>=measured_value][1]
 		}
-			
-	nlevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=fitmetric_trend,...)
-	fmt <- paste0("%1.",ndecimals,"f")
+	fmt <- paste0("%1.",ndecimals,"f")		
+	
+	if(fitout=="threshold" | fitout=="table"){
+		nlevel 		<- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=fitmetric_trend,...)
+		vnlevel 		<- sprintf(fmt, nlevel)
+		}
+	if(fitout=="equiv" | fitout=="table"){
+		feq    		<- fitEquiv(measured_value=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
+		vfiteq 		<- sprintf(fmt, feq)
+	}
+	
+	if(fitout=="threshold"){outnm = vnlevel}
+	if(fitout=="equiv")    {outnm = vfiteq}
 	
 
-	if(table){
+	if(fitout=="table"){
 		tfitmetric 	<- "Fit Metric:"
 		vfitmetric 	<- deparse(substitute(fitmetric))
 	
@@ -58,7 +68,7 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 		vmv			<- measured_value
 	
 		tnlevel 	<- if(fitmetric_trend=="Increasing"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
-		vnlevel 	<- nlevel
+		vnlevel 	<- sprintf(fmt, nlevel)
 	
 		tdpct 		<- "Min Acceptable Noise Percentile:"
 		vdpct 		<- sprintf(fmt, pct)
@@ -67,7 +77,6 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 		vapct 		<- sprintf(fmt, current_percentile)
 
 		tfiteq 		<- "Fit Equivalent Value:"
-		feq    		<- fitEquiv(measured_value=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
 		vfiteq 		<- sprintf(fmt, feq)
 	
 	
@@ -77,5 +86,5 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 	
 		}
 	
-	if(table){return(outdf)} else {return(cat(sprintf(fmt,current_percentile)))}
+	if(fitout=="table"){return(outdf)} else {return(outnm)}
 }

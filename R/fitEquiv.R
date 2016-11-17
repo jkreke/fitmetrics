@@ -27,12 +27,13 @@ fitEquiv <- function(measured_value, dof, pct=0.95, ndecimals=2, fitmetric=R2, t
 	fitval=measured_value
 	noiselevel <- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, trend=trend, ...)
 
+	smidge=10^(-10)
 	#determine if noise trends upward (positive) or downward (negative)
 	if(is.null(trend)){fitmetric_trend = utrend(fitmetric)} else {fitmetric_trend=trend}
 	if(fitmetric_trend=="Decreasing"){
-			eqfitval <- (fitval-noiselevel)/(1-noiselevel + 0.00000000001)
+			eqfitval <- (fitval-noiselevel)/(1-noiselevel + smidge)
 		} else if(fitmetric_trend=="Increasing"){
-			eqfitval <- (fitval)/(noiselevel + 0.00000000001) #don't use (nl-fv)/(nl).  Opposite trend wrt fv.
+			eqfitval <- (fitval)/(noiselevel + smidge) #don't use (nl-fv)/(nl).  Opposite trend wrt fv.
 		} else 
 			stop("uncertain or flat fitmetric trend")
 	

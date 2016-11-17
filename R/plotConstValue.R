@@ -26,6 +26,9 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 
 	fitval=measured_value
 	fitmetric_trend <- utrend(fitmetric)
+	if(fitmetric_trend=="Increasing"){borc <- "Ceiling"}
+	if(fitmetric_trend=="Decreasing"){borc <- "Baseline"}
+
 
 	pct <- pct[1]										#ensure only one pct is used
 	dfx <- Table_dofbypct(doflist=doflist, pctlist=pct, order=order, ndecimals=ndecimals, fitmetric=fitmetric, trend=fitmetric_trend,...)
@@ -53,10 +56,10 @@ plotConstValue <- function(measured_value, doflist=c(2:30), pct=0.95, order=4, n
 		ylim(miny,mxy) +
 		xlab("Degrees of Freedom") +
 		ylab(ylb) +
-		ggtitle(paste(gtitle, "Noise Baseline and Equivalent Measure\nwith Constant Measured Value")) +
-		geom_text(aes(x=maxx, y=(pcy-0.05)),		label=paste0("Baseline Noise Level\npercentile = ",pct*100,"%"), 	color='red',  hjust=1) + 
-		geom_text(aes(x=maxx, y=(eqy-0.05)),		label=paste0("Equivalent Value"), 				color='blue', hjust=1) +
-		geom_text(aes(x=maxx, y=(fitval+0.05)),	label=paste0("Measured Value = ",fitval), 		color='black',hjust=1)
+		ggtitle(paste(gtitle, "Noise",borc,"and Equivalent Measure\nwith Constant Measured Value")) +
+		annotate("text", x=maxx, y=(pcy-0.05),		label=paste0(borc," Noise Level\npercentile = ",pct*100,"%"), 	color='red',  hjust=1) + 
+		annotate("text", x=maxx, y=(eqy-0.05),		label=paste0("Equivalent Value"), 				color='blue', hjust=1) +
+		annotate("text", x=maxx, y=(fitval+0.05),	label=paste0("Measured Value = ",fitval), 		color='black',hjust=1)
 	
 	
 	return(plot)

@@ -39,14 +39,15 @@ plotNoiseLevel <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=
 	#sizes <- c(1, 0.8, 0.6, 0.4, 0.2)   #use these for geom_path instead of geom_point
 	
 	fitmetric_trend = utrend(fitmetric)
+	if(fitmetric_trend=="Increasing"){borc <- "Ceiling"} else {borc <- "Baseline"}
 	noisedf <- Table_dofbypct(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=fitmetric_trend, ...)
 	mxy <- 0.9*max(noisedf[,1])
 	N = 10^order
 	plt <- ggplot(noisedf)
 
-	if(length(pctlist)==1){maintitle <- paste("Baseline Noise Level\nfor One Noise Percentile(p)")
+	if(length(pctlist)==1){maintitle <- paste("Noise",borc,"for \nOne Percentile(p)")
 						} else {
-						maintitle <- paste("Baseline Noise Level\nfor Various Noise Percentiles(p)")
+						maintitle <- paste("Noise",borc,"for \nVarious Percentiles(p)")
 						}
 	fitmetric.character <- deparse(substitute(fitmetric))
 	fmet <- fitmetric.character
@@ -54,30 +55,30 @@ plotNoiseLevel <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=
 	if(fitmetric.character=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
 	if(fitmetric.character=='rmse'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
 	if(fitmetric.character=="user"){fmet <- paste("user", maintitle);     ylb=expression(user)}
-	gtitle <- paste(fmet, "Noise Level")
+	gtitle <- paste(fmet, "")
 
 
 	if(pctlength>=1){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(noisedf)), noisedf[,1]), color=mcolor[1], size=sizes[1])  +
-		geom_text(aes(x=max(doflist), y=mxy-0.00, label=paste0("p = ",pctlist[1])), color=mcolor[1], hjust=1, size=4)}
+		annotate("text", x=max(doflist), y=mxy-0.00, label=paste0("p = ",pctlist[1]), color=mcolor[1], hjust=1, size=4)}
 	if(pctlength>=2){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(noisedf)), noisedf[,2]), color=mcolor[2], size=sizes[2])  +
-		geom_text(aes(x=max(doflist), y=mxy-0.05, label=paste0("p = ",pctlist[2])), color=mcolor[2], hjust=1, size=4)}
+		annotate("text", x=max(doflist), y=mxy-0.05, label=paste0("p = ",pctlist[2]), color=mcolor[2], hjust=1, size=4)}
 	if(pctlength>=3){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(noisedf)), noisedf[,3]), color=mcolor[3], size=sizes[3])  +
-		geom_text(aes(x=max(doflist), y=mxy-0.10, label=paste0("p = ",pctlist[3])), color=mcolor[3], hjust=1, size=4)}
+		annotate("text", x=max(doflist), y=mxy-0.10, label=paste0("p = ",pctlist[3]), color=mcolor[3], hjust=1, size=4)}
 	if(pctlength>=4){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(noisedf)), noisedf[,4]), color=mcolor[4], size=sizes[4])  +
-		geom_text(aes(x=max(doflist), y=mxy-0.15, label=paste0("p = ",pctlist[4])), color=mcolor[4], hjust=1, size=4)} 
+		annotate("text", x=max(doflist), y=mxy-0.15, label=paste0("p = ",pctlist[4]), color=mcolor[4], hjust=1, size=4)}
 	if(pctlength>=5){plt <- plt + 
 		geom_point(aes(as.numeric(row.names(noisedf)), noisedf[,5]), color=mcolor[5], size=sizes[5])  +
-		geom_text(aes(x=max(doflist), y=mxy-0.20, label=paste0("p = ",pctlist[5])), color=mcolor[5], hjust=1, size=4)}
+		annotate("text", x=max(doflist), y=mxy-0.20, label=paste0("p = ",pctlist[5]), color=mcolor[5], hjust=1, size=4)}
 	
 	plt <- plt + 
 	ggtitle(gtitle) +
 	xlab("Degrees of Freedom") +
 	ylab(ylb) +
-	geom_text(aes(x=max(doflist), y=mxy+0.05, label=paste0("Number of Samples = ",N)), color='black', hjust=1, size=4)
+	annotate("text", x=max(doflist), y=mxy+0.05, label=paste0("Number of Samples = ",N), color='black', hjust=1, size=4)
 
 	
 	return(plt)
