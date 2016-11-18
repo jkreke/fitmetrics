@@ -26,7 +26,7 @@
 #'
 #' @export
 #' pcdfs()
-pcdfs <- function(dof, order=6, ndecimals=2, dist=rnorm, fitmetric=R2, ... ){
+pcdfs <- function(dof, order=5, ndecimals=2, dist=rnorm, fitmetric=R2, ... ){
 
 if(order>=7){stop(paste("order is too large (10M) -- calculation time too long. Make order<7. Fractions OK."))}
 N=round(10^order,0)

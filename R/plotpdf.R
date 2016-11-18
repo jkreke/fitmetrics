@@ -20,7 +20,7 @@
 #'
 #' @export
 #' plotpdf()
-plotpdf <- function(dof, order=4, dist=rnorm, fitmetric=R2, ...){
+plotpdf <- function(dof, order=5, dist=rnorm, fitmetric=R2, ...){
 
 
 dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)

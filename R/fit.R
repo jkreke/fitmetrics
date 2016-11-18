@@ -25,33 +25,35 @@
 #' @export
 #' fit()
 #
-fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=2, dist=rnorm, fitout="table", ... ){
+fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=5, ndecimals=2, dist=rnorm, output="table", ... ){
 	dfx <- pcdfs(dof,fitmetric=fitmetric,order=order,dist=dist,...)
-	
-	fitmetric_trend <- utrend(fitmetric)
-	if(fitmetric_trend=="Decreasing"){
+
+	outlist <- c("table","threshold","equiv")
+	if(!(output %in% outlist)){stop("output must be \'table\', \'threshold\' or \'equiv\'")}
+	ftrend <- utrend(fitmetric)
+	if(ftrend=="Decreasing"){
 		current_percentile <- dfx$cdf[dfx$fitval>=measured_value][1]  #list all cdfs where fitval>=measured and take first one in the list
 		}
 		
-	if(fitmetric_trend=="Increasing"){
+	if(ftrend=="Increasing"){
 		current_percentile <- 1-dfx$cdf[dfx$fitval>=measured_value][1]
 		}
 	fmt <- paste0("%1.",ndecimals,"f")		
 	
-	if(fitout=="threshold" | fitout=="table"){
-		nlevel 		<- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=fitmetric_trend,...)
+	if(output=="threshold" | output=="table"){
+		nlevel 		<- fitNoise(dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, trend=ftrend, order=order, ...)
 		vnlevel 		<- sprintf(fmt, nlevel)
 		}
-	if(fitout=="equiv" | fitout=="table"){
-		feq    		<- fitEquiv(measured_value=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist,...)
+	if(output=="equiv" | output=="table"){
+		feq    		<- fitEquiv(measured_value=measured_value, dof=dof, pct=pct, ndecimals=ndecimals, fitmetric=fitmetric, dist=dist, order=order, ...)
 		vfiteq 		<- sprintf(fmt, feq)
 	}
 	
-	if(fitout=="threshold"){outnm = vnlevel}
-	if(fitout=="equiv")    {outnm = vfiteq}
+	if(output=="threshold"){outnm = vnlevel}
+	if(output=="equiv")    {outnm = vfiteq}
 	
 
-	if(fitout=="table"){
+	if(output=="table"){
 		tfitmetric 	<- "Fit Metric:"
 		vfitmetric 	<- deparse(substitute(fitmetric))
 	
@@ -67,7 +69,7 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 		tmv			<- "Measured Value:"
 		vmv			<- measured_value
 	
-		tnlevel 	<- if(fitmetric_trend=="Increasing"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
+		tnlevel 	<- if(ftrend=="Increasing"){tnlevel <- paste(vfitmetric,"Noise Ceiling:")} else {tnlevel <- paste(vfitmetric,"Noise Baseline:")}
 		vnlevel 	<- sprintf(fmt, nlevel)
 	
 		tdpct 		<- "Min Acceptable Noise Percentile:"
@@ -86,5 +88,5 @@ fit <- function(measured_value, dof, pct=0.95, fitmetric=R2, order=6, ndecimals=
 	
 		}
 	
-	if(fitout=="table"){return(outdf)} else {return(outnm)}
+	if(output=="table"){return(outdf)} else {return(as.numeric(outnm))}
 }
