@@ -43,7 +43,7 @@ Table_dofbypct <- function(doflist=NULL, pctlist=NULL, order=4, ndecimals=2, fit
 
 	
 	shell <- matrix(nrow=nds, ncol=nps)
-	noisetab <- matrix(mapply(function(x,i,j) fitNoise(doflist[i], pctlist[j], order=order, ndecimals=ndecimals, fitmetric=fitmetric, trend=fitmetric_trend, ...), shell,row(shell),col(shell)), nrow=nds, ncol=nps)
+	noisetab <- matrix(mapply(function(x,i,j) fitNoise(dof=doflist[i], pct=pctlist[j], order=order, ndecimals=ndecimals, fitmetric=fitmetric,...), shell,row(shell),col(shell)), nrow=nds, ncol=nps)
 
 	noisetab <- as.data.frame(noisetab)
 	colnames(noisetab) <- colnams

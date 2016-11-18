@@ -27,7 +27,7 @@ dfx <- pcdfs(dof=dof, order=order, dist=dist, fitmetric=fitmetric, ...)
 
 #see http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when.  Need this to eliminate a note during R CMD check
 cdf <- NULL
-Nsam <- 10^order
+Nsam <- floor(10^order)
 cdst <- deparse(substitute(dist))
 cfit <- deparse(substitute(fitmetric))
 mxy  <- max(dfx$cdf)

@@ -68,7 +68,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, plot_pctr2=F,
 	               if(ftrend=="Decreasing"){
 				          ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]
 			} else if(ftrend=="Increasing") {
-							print("this is an increasing fitmetric")
+							#print("this is an increasing fitmetric")
 				          ptable$fitEquiv <- f*(ptable[,1])
 			} else {
 				          stop("fitmetric trend flat or uncertain")
