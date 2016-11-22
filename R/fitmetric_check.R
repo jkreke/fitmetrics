@@ -1,13 +1,36 @@
+##############################################################################################################################
+#
+#	determine that the arguments of the fitmetric function have the correct class then convert them to matrices.
+#
+#
+#' Convert fitmetric arguments to matrices.
+#'
+#' Checks classes of fitmetric arguments and converts them to matrices if they are not already.
+#'
+#' @param x a vector of class numeric or integer or a numeric matrix
+#' @param y a vector of class numeric or integer or a numeric matrix
+#'
+#' @return a list containing x, y, N(number of rows), and dof(number of columns)
+#'
+#' @examples
+#' vlist <- fitmetric_check(runif(100000),runif(100000))
+#' mlist <- fitmetric_check(matrix(rnorm(10000),ncol=10),matrix(10000),ncol=10))
+#'
+#' @export
+#' fitmetric_check()
 fitmetric_check <- function(x,y){
 
 #this routine is only useful when the function is used outside of the fitmetrics package.
-#if the function is used within the package, the routine that calls it generates the arguments beforehand so they're already checked for consistency, class, length,....
+# when the function is used within the package, the routine that calls it generates the arguments 
+# beforehand so they're already checked for consistency, class, length,....
 
-#however, the user may wish to use the function outside of fitmetics package and so the arguments need some checking.
-# the function should be written so that there are two matricies that are used in calculations.  #For instance, R2 has x and y or dependent and independent variables.  RMSE also has two #arguments (same, independent and dependent variables).  One may consider these variables "model" and "observation" and it really does not matter which is which.
+# However, the user may wish to use the function outside of fitmetics package on functions he or she might create and so the arguments need some checking.
+# the function should be written so that there are two matrices of Nxdof dimensions.  
+# For instance, R2 has x and y or dependent and independent variables.  RMSE also has two 
+# arguments (same, independent and dependent variables).  One may consider these variables "model" and "observation" and for this it really does not matter which is which.
 
 
-#check classes and dimensions.  If they're vectors, make them matricies of 1xdof dimensions.
+#check classes and dimensions.  If they're vectors, make them matrices of 1xdof dimensions.
 	gclasses <- c("numeric", "integer")
 	
 	if(class(x) %in% gclasses & class(y) %in% gclasses & length(x)==length(y)){
@@ -38,7 +61,7 @@ fitmetric_check <- function(x,y){
 		
 		
 # Return a list of the original inputs (x,y) now 
-#  made into matricies if they were not already, along with N and dof.
+#  made into matrices if they were not already, along with N and dof.
 	mlist <- list(x,y,N,dof)
 	return(mlist)
 		

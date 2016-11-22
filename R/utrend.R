@@ -9,11 +9,11 @@
 #'
 #' @param fun as function R2, rmse, or user (user-defined function)
 #'
-#' @return a character string ("Positive", "Negative", "Flat", "Uncertain")
+#' @return a character string ("Increasing", "Decreasing", "Flat", "Uncertain")
 #'
 #' @examples
 #' utrend(R2)
-#' utrend(user)
+#' utrend(rmse)
 #'
 #' @export
 #' utrend()

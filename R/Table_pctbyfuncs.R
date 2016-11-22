@@ -12,7 +12,7 @@
 #' @param pctlist a vector of real numbers between 0 and 1, minimum acceptable noise levels.
 #' @param ndecimals an integer
 #' @param dist a random number distribution function
-#' @param order a real number
+#' @param order a real number less than 7
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return data frame

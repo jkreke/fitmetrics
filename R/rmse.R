@@ -22,7 +22,7 @@ rmse <- function(obs, mdl){
 	mlist <- fitmetric_check(obs,mdl)
 	obs <- mlist[[1]]
 	mdl <- mlist[[2]]
-	N <- mlist[[3]]
+	N   <- mlist[[3]]
 	dof <- mlist[[4]]
 
 	#get delta

@@ -5,7 +5,7 @@
 #
 #' Print boilerplate stats
 #'
-#' Prints a standard set of stats for a given degree of freedom
+#' Prints a standard set of stats for a given degree of freedom, fitmetric and noise distribution
 #'
 #' @param measured_value a real number within the range of fitmetric
 #' @param dof  an integer
