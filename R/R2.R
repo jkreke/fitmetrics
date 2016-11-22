@@ -13,10 +13,11 @@
 #' @return a vector of numbers with length equal to the number of trials (N)
 #'
 #' @examples
-#' R2( seq(2:10),(3*rnorm(2:10)+4) )
+#' R2( c(2:10),rnorm(length(2:10)) )
+#' R2( matrix(runif(10000),ncol=5),matrix(runif(10000),ncol=5))
 #'
 #' @export
-#'R2
+#' R2()
 R2 <- function(x, y){
 
 	mlist <- fitmetric_check(x,y)

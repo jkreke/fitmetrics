@@ -13,6 +13,7 @@
 #' @param ndecimals an integer
 #' @param dist a random number distribution function
 #' @param order a real number less than 7
+#' @param fitmetriclist a vector of goodness-of-fit functions
 #' @param ... any argument that functions within this routine might use
 #'
 #' @return data frame

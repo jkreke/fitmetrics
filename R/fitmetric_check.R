@@ -14,10 +14,11 @@
 #'
 #' @examples
 #' vlist <- fitmetric_check(runif(100000),runif(100000))
-#' mlist <- fitmetric_check(matrix(rnorm(10000),ncol=10),matrix(10000),ncol=10))
+#' mlist <- fitmetric_check(matrix(rnorm(10000),ncol=10),matrix(rnorm(10000),ncol=10))
 #'
 #' @export
 #' fitmetric_check()
+
 fitmetric_check <- function(x,y){
 
 #this routine is only useful when the function is used outside of the fitmetrics package.

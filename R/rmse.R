@@ -16,7 +16,7 @@
 #' rmse(seq(3:20), (seq(3:20)+rnorm(18)^2))
 #'
 #' @export
-#'rmse
+#' rmse()
 rmse <- function(obs, mdl){
 
 	mlist <- fitmetric_check(obs,mdl)
