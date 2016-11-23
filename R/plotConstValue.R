@@ -1,10 +1,9 @@
 ##############################################################################################################################
+# Plot Fit Equivalent for a single fitmetric value across a range of dofs and a constant measured value
 #
-# Plot Equiv for a single fitmetric value across a range of dofs
-#
-#' Plot Fit Equivalent
+#' Plot Fit Equivalent and Constant Value
 #'
-#' Plots the Fit Equivalent
+#' Plots the Fit Equivalent with Constant Measured Value
 #'
 #' @param measured_value a real number, the actual measured value
 #' @param doflist a vector of integers for the degrees of freedom
@@ -17,8 +16,8 @@
 #' @return ggplot object
 #'
 #' @examples
-#' plotEquiv(0.8)
-#' plotEquiv(0.1, fitmetric=rmse)
+#' plotConstValue(0.8)
+#' plotConstValue(0.1, fitmetric=rmse)
 #'
 #' @export
 #' plotConstValue()

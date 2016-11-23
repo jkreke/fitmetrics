@@ -16,7 +16,7 @@
 #' @return ggplot object
 #'
 #' @examples
-#' plotcdf(5, dist=uniform, fitmetric=rmse)
+#' plotcdf(5, dist=rnorm, fitmetric=rmse)
 #'
 #' @export
 #' plotcdf()
@@ -30,10 +30,12 @@ cdf <- NULL
 Nsam <- floor(10^order)
 cdst <- deparse(substitute(dist))
 cfit <- deparse(substitute(fitmetric))
-mxy  <- max(dfx$cdf)
-maxx <- max(dfx$fitval)
-plot <- ggplot(dfx) + 
-		geom_point(aes(fitval, cdf),size=1) +
+dfxcdf <- dfx$cdf
+dfxfitval <- dfx$fitval
+mxy  <- max(dfxcdf)
+maxx <- max(dfxfitval)
+plot <- ggplot() + 
+		geom_point(aes(dfxfitval, dfxcdf),size=1) +
 		ylim(0,mxy) + 
 		xlab(cfit) + 
 		ylab("Cumulative Probability") +

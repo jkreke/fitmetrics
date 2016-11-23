@@ -19,7 +19,7 @@
 #' @return data frame
 #'
 #' @examples
-#' Table_pctbyfuncs(6, dist='normal', sd=0.3)
+#' Table_pctbyfuncs(6, dist=rnorm, sd=0.3)
 #'
 #' @export
 #' Table_pctbyfuncs()

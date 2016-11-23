@@ -21,8 +21,8 @@
 #' @return a data frame
 #'
 #' @examples
-#' pcdf(5, order=5)
-#' pcdf(10, order=4, fitmetric=rmse)
+#' pcdfs(5, order=5)
+#' pcdfs(10, order=4, fitmetric=rmse)
 #'
 #' @export
 #' pcdfs()

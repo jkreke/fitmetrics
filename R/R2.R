@@ -7,20 +7,20 @@
 #'
 #' Calculates R-squared given vectors for x and y
 #'
-#' @param x a vector or matrix of real numbers
-#' @param y a vector or matrix of real numbers
+#' @param x1 a vector or matrix of real numbers
+#' @param y1 a vector or matrix of real numbers
 #'
 #' @return a vector of numbers with length equal to the number of trials (N)
 #'
 #' @examples
-#' R2( c(2:10),rnorm(length(2:10)) )
-#' R2( matrix(runif(10000),ncol=5),matrix(runif(10000),ncol=5))
+#' R2(c(1,2,3,4,5),c(1,2,3,4,4))
+#' R2(matrix(runif(10000),ncol=5),matrix(runif(10000),ncol=5))
 #'
 #' @export
 #' R2()
-R2 <- function(x, y){
+R2 <- function(x1, y1){
 
-	mlist <- fitmetric_check(x,y)
+	mlist <- fitmetric_check(x1,y1)
 	x <- mlist[[1]]
 	y <- mlist[[2]]
 	N <- mlist[[3]]

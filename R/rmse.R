@@ -13,7 +13,10 @@
 #' @return a vector of numbers with length equal to the number of trials (N)
 #'
 #' @examples
-#' rmse(seq(3:20), (seq(3:20)+rnorm(18)^2))
+#' rmse(c(2:20),c(2:20 + c(rep(0.1,5),rep(-0.2,10),rep(0.3,4))))
+#' mata <- matrix(runif(10000),ncol=5)
+#' matb <- matrix(runif(10000),ncol=5)
+#' rmse(mata, matb)
 #'
 #' @export
 #' rmse()

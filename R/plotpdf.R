@@ -30,10 +30,12 @@ pdf <- NULL
 Nsam <- floor(10^order)
 cdst <- deparse(substitute(dist))
 cfit <- deparse(substitute(fitmetric))
+dfxpdf <- dfx$pdf
+dfxfitval <- dfx$fitval
 mxy  <- max(dfx$pdf)
 maxx <- max(dfx$fitval)
-plot <- ggplot(dfx) + 
-		geom_point(aes(fitval, pdf),size=1) +
+plot <- ggplot() + 
+		geom_point(aes(dfxfitval, dfxpdf),size=1) +
 		ylim(0,mxy) +
 		xlab(cfit) + 
 		ylab("Probability Density") +

@@ -1,6 +1,6 @@
 ##############################################################################################################################
 #
-# Plot the fitvals for a range of dofs that are equivalent to a single measured fitval
+# Plot this for a range of dofs that are equivalent to a single measured fitval
 #		Plot the measured fit value (black dot)
 #		Plot the noise level (noise threshold)) (red dot)
 #		Shade the area shoing improved fit measures (light gray)
@@ -8,7 +8,7 @@
 #		if desired, plot the noise level that equals fitval (blue circles)
 #
 #
-#' Plot FitValue Constant Noise
+#' Plot Measured Value with Constant Noise
 #'
 #' Plots the Fit Equivalent
 #'
@@ -32,7 +32,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 
 	cfit   <- deparse(substitute(fitmetric))
 	ftrend <- utrend(fitmetric)
-	fitval <- measured_value
+	mval <- measured_value
 	mcolor <- c("red", "blue", "forestgreen", "slategray4", "gray20", "black")
 	
 	if(ftrend=="Increasing"){borc<-"Ceiling"}
@@ -45,12 +45,12 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 	pctlist <- c(pct)
 	
 	
-	# this will add a plot of points that follow the curve where the pct equals measured_value(aka fitval) -- just to show the probability of noise for this R2.
+	# this will add a plot of points that follow the curve where the pct equals measured_value(aka mval) -- just to show the probability of noise for this R2.
 
-	# using that dfx, find the closest dfx$R2 (aka pct) to the given fitval, or pct_r2
+	# using that dfx, find the closest dfx$fitval (aka pct) to the given mval, or pct_r2
 	if(add_mvp){
-		if(ftrend=="Decreasing"){pct_fv <- dfx$cdf[dfx$fitval>=fitval][1]}
-		if(ftrend=="Increasing"){pct_fv <- 1-dfx$cdf[dfx$fitval>=fitval][1]}
+		if(ftrend=="Decreasing"){pct_fv <- dfx$cdf[dfx$fitval>=mval][1]}
+		if(ftrend=="Increasing"){pct_fv <- 1-dfx$cdf[dfx$fitval>=mval][1]}
 		pctlist=c(pctlist,pct_fv)			#take out if not plotting pct_R2.  Comprising pct and pct_R2
 		}
 #stop(paste0("getting ptable for pctlist = ", pctlist))
@@ -64,7 +64,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 	if(cfit=="rmse"){ylb=expression(RMSE); gtitle="RMSE"}
 	if(cfit=="user"){ylb=expression(user); gtitle="user"}
 
-	f = fitEquiv(fitval,dof,pct,fitmetric=fitmetric, trend=ftrend, ...)
+	f = fitEquiv(mval,dof,pct,fitmetric=fitmetric, trend=ftrend, ...)
 	               if(ftrend=="Decreasing"){
 				          ptable$fitEquiv <- f*(1-ptable[,1]) + ptable[,1]
 			} else if(ftrend=="Increasing") {
@@ -73,7 +73,7 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 			} else {
 				          stop("fitmetric trend flat or uncertain")
 			}		
-	ptable$fitEquiv[(dof-1)]=fitval   #fitEquiv at dof must equal the measured_value at dof.  ptable will be a little off,due to randomness so force them to be equal.
+	ptable$fitEquiv[(dof-1)]=mval   #fitEquiv at dof must equal the measured_value at dof.  ptable will be a little off,due to randomness so force them to be equal.
 
 #print(head(ptable))
 #print(head(f))
@@ -98,21 +98,21 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 
 
 	plt <- ggplot(ptable) +
-			geom_point(data=data.frame(fitval,dof), aes(dof,fitval), 			shape=16,color=mcolor[6],size=3,na.rm=T) + 				#measured value
+			geom_point(data=data.frame(mval,dof), aes(dof,mval), 			shape=16,color=mcolor[6],size=3,na.rm=T) + 				#measured value
 			geom_point(aes(as.numeric(row.names(ptable)),ptable[,2]),			shape=1, color=mcolor[6],size=2,na.rm=T) +
 			geom_point(data=data.frame(noiselevel, dof),   aes(dof,noiselevel),	shape=16,color=mcolor[1],size=3,na.rm=T) +
 			geom_point(aes(as.numeric(row.names(ptable)),ptable[,1]),			shape=1, color=mcolor[1],size=2,na.rm=T) + 
 			
-			annotate("text", x=ttx, y=tval[1], label=paste0(cfit, " = ",fitval, ", dof = ",dof), color=mcolor[6], hjust=0, size=4) +
-			annotate("text", x=ttx, y=tval[2], label=paste0("fitEquiv = ",f),                    color=mcolor[6], hjust=0, size=4) +
-			annotate("text", x=ttx, y=tval[3], label=paste0("fitNoise = ",noiselevel),           color=mcolor[1], hjust=0, size=4) +
-			annotate("text", x=ttx, y=tval[4], label=paste0("percentile = ",100*pctlist[1],"%"), color=mcolor[1], hjust=0, size=4) +
-			annotate("text", x=ttx, y=tval[5], label=paste0("Improved Measure (light area)"),    color=mcolor[4], hjust=0, size=4) +
+			annotate("text", ttx, tval[1], label=paste0(cfit, " = ",mval, ", dof = ",dof), color=mcolor[6], hjust=0, size=4) +
+			annotate("text", ttx, tval[2], label=paste0("fitEquiv = ",f),                    color=mcolor[6], hjust=0, size=4) +
+			annotate("text", ttx, tval[3], label=paste0("fitNoise = ",noiselevel),           color=mcolor[1], hjust=0, size=4) +
+			annotate("text", ttx, tval[4], label=paste0("percentile = ",100*pctlist[1],"%"), color=mcolor[1], hjust=0, size=4) +
+			annotate("text", ttx, tval[5], label=paste0("Improved Measure (light area)"),    color=mcolor[4], hjust=0, size=4) +
 			
-			geom_point(data=data.frame(x=ttx-0.5, y=tval[1]), aes(x,y), shape=16, color=mcolor[6], size=3) + 
-			geom_point(data=data.frame(x=ttx-0.5, y=tval[2]), aes(x,y), shape=1,  color=mcolor[6], size=2) +
-			geom_point(data=data.frame(x=ttx-0.5, y=tval[3]), aes(x,y), shape=16, color=mcolor[1], size=3) +
-			geom_point(data=data.frame(x=ttx-0.5, y=tval[4]), aes(x,y), shape=1,  color=mcolor[1], size=2) +
+			geom_point(aes(ttx-0.5,tval[1]), shape=16, color=mcolor[6], size=3) + 
+			geom_point(aes(ttx-0.5,tval[2]), shape=1,  color=mcolor[6], size=2) +
+			geom_point(aes(ttx-0.5,tval[3]), shape=16, color=mcolor[1], size=3) +
+			geom_point(aes(ttx-0.5,tval[4]), shape=1,  color=mcolor[1], size=2) +
 			ggtitle(paste(gtitle, "Noise", borc,"and Equivalent Measure \nwith Constant Noise Level")) +
 			xlab("Degrees of Freedom") +
 			ylab(ylb) 
@@ -124,24 +124,24 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymax=ptable[,2], ymin=0),fill=mcolor[4],alpha=0.3,na.rm=T)}
 			
 
-	#if pct_r2 is T, plot the noise level where pct=fitval
+	#if pct_r2 is T, plot the noise level where pct=mval
 	if(add_mvp){plt <- plt + 
 			geom_point(aes(as.numeric(row.names(ptable)),ptable[,3]),shape=1,color=mcolor[2],size=2) +
-			annotate("text", x=ttx, y=tval[7], label=paste0(cfit," Noise Percentile = ", round(100*pctlist[2],0),"%"), color=mcolor[2], hjust=0,size=4, na.rm=T) +
-			geom_point(data=data.frame(x=ttx-0.5, y=tval[7]), aes(x,y), shape=1, color=mcolor[2], size=2)
+			annotate("text", ttx, tval[7], label=paste0(cfit," Noise Percentile = ", round(100*pctlist[2],0),"%"), color=mcolor[2], hjust=0,size=4, na.rm=T) +
+			geom_point(aes(ttx-0.5, tval[7]), shape=1, color=mcolor[2], size=2)
 			}
 
-	#if fitval is in the noise, show the improved but still noisy R2 values in a black ribbon.
-	if(fitval<ptable[dof,1] & ftrend=="Decreasing"){ plt <- plt +
-			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=ptable[,1]),fill=mcolor[5],alpha=0.7,na.rm=T) +
-			annotate("text", x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5],hjust=0,size=4) +
-			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=3,shape=16, color=mcolor[6],na.rm=T) }			
+	#if mval is in the noise, show the improved but still noisy R2 values in a black ribbon.
+	if(mval<ptable[dof,1] & ftrend=="Decreasing"){ plt <- plt +
+			geom_ribbon(aes(as.numeric(row.names(ptable)), ymin=ptable[,2], ymax=ptable[,1]),fill=mcolor[5],alpha=0.7,na.rm=T) +
+			annotate("text", ttx, tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5],hjust=0,size=4) +
+			geom_point(data=data.frame(mval,dof), aes(dof,mval),size=3,shape=16, color=mcolor[6],na.rm=T) }			
 			
-	#if fitval is in the noise, show the improved but still noisy RMSE values in a black ribbon.
-	if(fitval>ptable[dof,1] & ftrend=="Increasing"){ plt <- plt +
-			geom_ribbon(aes(x=as.numeric(row.names(ptable)), ymin=ptable[,1], ymax=ptable[,2]),fill=mcolor[5],alpha=0.7,na.rm=T) +
-			annotate("text", x=ttx, y=tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
-			geom_point(data=data.frame(fitval,dof), aes(dof,fitval),size=3,shape=16, color=mcolor[6],na.rm=T) }				
+	#if mval is in the noise, show the improved but still noisy RMSE values in a black ribbon.
+	if(mval>ptable[dof,1] & ftrend=="Increasing"){ plt <- plt +
+			geom_ribbon(aes(as.numeric(row.names(ptable)), ymin=ptable[,1], ymax=ptable[,2]),fill=mcolor[5],alpha=0.7,na.rm=T) +
+			annotate("text", ttx, tval[6], label=paste0("Unacceptable Noise (dark area)"), color=mcolor[5], hjust=0, size=4) +
+			geom_point(data=data.frame(mval,dof), aes(dof,mval),size=3,shape=16, color=mcolor[6],na.rm=T) }				
 
 
 	return(plt)
