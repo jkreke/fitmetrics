@@ -1,4 +1,23 @@
-	
+##############################################################################################################################
+#
+# The Kolmogorov-Smirnov two-sided calculation based on samples of two distributions
+#
+#
+#' KS_D
+#'
+#' Calculates the two-sided KS statistic given vectors for x and y
+#'
+#' @param x a vector or matrix of real numbers
+#' @param y a vector or matrix of real numbers
+#'
+#' @return a vector of numbers with length equal to the number of trials (N)
+#'
+#' @examples
+#' KS_D(c(1,2,3,4,5),c(1,2,3,4,4))
+#' KS_D(matrix(runif(100),ncol=7),matrix(runif(100),ncol=7))
+#'
+#' @export
+#' KS_D()	
 KS_D <- function(x,y){
 
 	KS_D2 <- function(x,y){

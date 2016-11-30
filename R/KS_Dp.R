@@ -1,4 +1,23 @@
-	
+##############################################################################################################################
+#
+# The one-sided KS statistic based on two numeric vectors of equal length
+#
+#
+#' KS_Dp
+#'
+#' Calculates the one-sided KS statistic given vectors for x and y
+#'
+#' @param x a vector or matrix of real numbers
+#' @param y a vector or matrix of real numbers
+#'
+#' @return a vector of numbers with length equal to the number of trials (N)
+#'
+#' @examples
+#' KS_Dp(c(1,2,3,4,5),c(1,2,3,4,4))
+#' KS_Dp(matrix(runif(100),ncol=7),matrix(runif(100),ncol=7))
+#'
+#' @export
+#' KS_Dp()	
 KS_Dp <- function(x,y){
 
 	KS_Dp2 <- function(x,y){
