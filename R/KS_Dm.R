@@ -1,0 +1,38 @@
+	
+KS_Dm <- function(x,y){
+
+	KS_Dm2 <- function(x,y){
+		#alternative="greater"
+	  x <- x[!is.na(x)]
+	  n <- length(x)
+	  n.x <- as.double(n)
+  
+	  y <- y[!is.na(y)]
+	  n.y <- length(y)
+  
+	  w <- c(x, y)
+	  z <- cumsum(ifelse(order(w) <= n.x, 1/n.x, -1/n.y))
+	  z <- z[c(which(difn(sort(w)) != 0), n.x + n.y)] #exclude ties
+	  STATISTIC <- -min(z)
+#	  STATISTIC <- switch(alternative, two.sided = max(abs(z)), 
+#                      greater = max(z), less = -min(z))
+                      
+  	return(STATISTIC)
+  }
+  
+  M <- fitmetric_check(x,y)
+  xx  <- M[[1]]
+  yy  <- M[[2]]
+  N   <- M[[3]]
+  dof <- M[[4]]
+
+  out <- apply(cbind(xx, yy),1,function(s){
+  	s1 <- s[1:dof]
+  	s2 <- s[(dof+1):(2*dof)]
+  	KS_Dm2(s1,s2)
+  	})
+  
+  
+  return(out)
+  
+  }

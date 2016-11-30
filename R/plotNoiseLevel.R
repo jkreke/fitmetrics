@@ -49,13 +49,9 @@ plotNoiseLevel <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=
 						} else {
 						maintitle <- paste("Noise",borc,"for \nVarious Percentiles(p)")
 						}
-	fitmetric.character <- deparse(substitute(fitmetric))
-	fmet <- fitmetric.character
-	ylb <- fitmetric.character
-	if(fitmetric.character=='R2'){fmet   <- paste("R-squared", maintitle);ylb=expression(R^2)}
-	if(fitmetric.character=='rmse'){fmet <- paste("RMSE", maintitle);     ylb=expression(RMSE)}
-	if(fitmetric.character=="user"){fmet <- paste("user", maintitle);     ylb=expression(user)}
-	gtitle <- paste(fmet, "")
+	fmet <- deparse(substitute(fitmetric))
+	ylb <- fmet
+	gtitle <- paste(fmet, maintitle)
 
 
 	if(pctlength>=1){plt <- plt + 

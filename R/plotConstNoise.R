@@ -59,10 +59,11 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 
 	ptable <- Table_dofbypct(doflist=doflist, pctlist=pctlist, order=order, fitmetric=fitmetric, trend=ftrend, ...)  #ptable is the list of noiselevel values for this fitmetric at each dof
 	noiselevel <- ptable[(dof-1),1]			#column 1 is the noiselevel values
-
-	if(cfit=="R2"){	ylb=expression(R^2);  gtitle="R-squared"}
-	if(cfit=="rmse"){ylb=expression(RMSE); gtitle="RMSE"}
-	if(cfit=="user"){ylb=expression(user); gtitle="user"}
+	gtitle <- cfit
+	ylb <- cfit
+	#if(cfit=="R2"){	ylb=expression(R^2);  gtitle="R-squared"}
+	#if(cfit=="rmse"){ylb=expression(RMSE); gtitle="RMSE"}
+	#if(cfit=="user"){ylb=expression(user); gtitle="user"}
 
 	f = fitEquiv(mval,dof,pct,fitmetric=fitmetric, trend=ftrend, ...)
 	               if(ftrend=="Decreasing"){
