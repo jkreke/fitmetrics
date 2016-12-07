@@ -13,7 +13,8 @@
 #' Plots the Fit Equivalent
 #'
 #' @param measured_value a real number within the range of fitmetric
-#' @param dof an integer
+#' @param dof an integer, degrees of freedom
+#' @param doflist a vector of integers identifying the range of degrees of freedom to plot over
 #' @param pct a real number between 0 and 1, minimum acceptable level of noise
 #' @param order a real number
 #' @param add_mvp a logical value indicating whether to include or not the fitEquive placed at each dof.
@@ -23,12 +24,12 @@
 #' @return ggplot object
 #'
 #' @examples
-#' plotConstNoise(0.8, 5)
-#' plotConstNoise(0.1, 5, fitmetric=rmse)
+#' plotConstNoise(0.8, 5, doflist=c(2:10),order=3)
+#' plotConstNoise(0.1, 5, doflist=c(2:10),order=3,fitmetric=rmse)
 #'
 #' @export
 #' plotConstNoise()
-plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fitmetric=R2, ...){
+plotConstNoise <- function(measured_value, dof, doflist=c(2:30), pct=0.95, order=4, add_mvp=F, fitmetric=R2, ...){
 
 	cfit   <- deparse(substitute(fitmetric))
 	ftrend <- utrend(fitmetric)
@@ -40,8 +41,10 @@ plotConstNoise <- function(measured_value, dof, pct=0.95, order=4, add_mvp=F, fi
 	# get the pcdf for this dof
 	dfx <- pcdfs(dof=dof, order=order, fitmetric=fitmetric, ...)
 	
+	doflist_range <- paste(min(doflist),"-", max(doflist))
+	if(!(dof %in% doflist)){stop(paste("dof",dof,"must be within the range of doflist",doflist_range))}
 	#if(dof<30){doflist = c(2:30)} else {lo=dof-15;hi=dof+15;doflist=c(lo:hi)}
-	doflist <- c(2:30)
+	#doflist <- c(2:30)
 	pctlist <- c(pct)
 	
 	

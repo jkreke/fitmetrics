@@ -16,8 +16,8 @@
 #' @return ggplot object
 #'
 #' @examples
-#' plotConstValue(0.8)
-#' plotConstValue(0.1, fitmetric=rmse)
+#' plotConstValue(0.8, doflist=c(2:10),order=3)
+#' plotConstValue(0.1, doflist=c(2:10),order=3,fitmetric=rmse)
 #'
 #' @export
 #' plotConstValue()

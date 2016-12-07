@@ -17,10 +17,10 @@
 #' @return ggplot object
 #'
 #' @examples
-#' plotNoiseLevel()
+#' plotNoiseLevel(doflist=c(2:10))
 #'
 #' @export
-#' plotNoise()
+#' plotNoiseLevel()
 plotNoiseLevel <- function(doflist=c(2:30), pctlist=c(0.95), order=4, ndecimals=2, fitmetric=R2, ...){
 	if(length(pctlist)>5){stop(paste("Too many percentiles to calculate", length(pctlist)))}
 
